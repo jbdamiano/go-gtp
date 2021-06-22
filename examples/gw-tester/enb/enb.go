@@ -346,7 +346,8 @@ func (e *enb) setupUPlane(ctx context.Context, sub *Subscriber) error {
 
 			rsp, err := e.s1mmeClient.Detach(ctx, req)
 			if err != nil {
-				log.Println("error")
+				log.Printf("error %w", err)
+				e.errCh <- err
 
 			} else {
 				switch rsp.Cause {
@@ -454,7 +455,7 @@ func (e *enb) runHTTPProbe(ctx context.Context, sub *Subscriber) error {
 		}
 		sub.count++
 		log.Printf("count is %d", sub.count)
-		if sub.count < 5 {
+		if sub.count > 5 {
 			log.Println("End")
 			return nil
 		}
