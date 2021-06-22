@@ -7,7 +7,7 @@ package gtpv1
 import (
 	"net"
 
-	"github.com/wmnsk/go-gtp/gtpv1/message"
+	"github.com/jbdamiano/go-gtp/gtpv1/message"
 )
 
 // Conn is an abstraction of both GTPv1-C and GTPv1-U Conn.

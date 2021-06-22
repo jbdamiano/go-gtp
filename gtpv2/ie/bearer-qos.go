@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/wmnsk/go-gtp/utils"
+	"github.com/jbdamiano/go-gtp/utils"
 )
 
 // NewBearerQoS creates a new BearerQoS IE.

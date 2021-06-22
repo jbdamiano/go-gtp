@@ -8,7 +8,7 @@ import (
 	"encoding/binary"
 	"io"
 
-	"github.com/wmnsk/go-gtp/utils"
+	"github.com/jbdamiano/go-gtp/utils"
 )
 
 // NewGlobalCNID creates a new GlobalCNID IE.

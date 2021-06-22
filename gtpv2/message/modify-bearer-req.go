@@ -5,7 +5,7 @@
 package message
 
 import (
-	"github.com/wmnsk/go-gtp/gtpv2/ie"
+	"github.com/jbdamiano/go-gtp/gtpv2/ie"
 )
 
 // ModifyBearerRequest is a ModifyBearerRequest Header and its IEs above.

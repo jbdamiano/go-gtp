@@ -47,6 +47,7 @@ type Subscriber struct {
 	// values for these fields are given from MME.
 	sgwAddr string
 	otei    uint32
+	count   uint32
 }
 
 // String returns the information of s in string.

@@ -4,7 +4,7 @@
 
 package message
 
-import "github.com/wmnsk/go-gtp/gtpv2/ie"
+import "github.com/jbdamiano/go-gtp/gtpv2/ie"
 
 // ReleaseAccessBearersResponse is a ReleaseAccessBearersResponse Header and its IEs above.
 type ReleaseAccessBearersResponse struct {

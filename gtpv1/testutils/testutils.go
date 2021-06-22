@@ -8,8 +8,8 @@ package testutils
 import (
 	"testing"
 
+	"github.com/jbdamiano/go-gtp/gtpv1/message"
 	"github.com/pascaldekloe/goe/verify"
-	"github.com/wmnsk/go-gtp/gtpv1/message"
 )
 
 // Serializable is just for testing gtpv2.Messages. Don't use this.

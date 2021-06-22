@@ -14,9 +14,9 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/vishvananda/netlink"
 
-	"github.com/wmnsk/go-gtp/gtpv1"
-	"github.com/wmnsk/go-gtp/gtpv2"
-	"github.com/wmnsk/go-gtp/gtpv2/message"
+	"github.com/jbdamiano/go-gtp/gtpv1"
+	"github.com/jbdamiano/go-gtp/gtpv2"
+	"github.com/jbdamiano/go-gtp/gtpv2/message"
 )
 
 type sgw struct {

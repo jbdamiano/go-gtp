@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/wmnsk/go-gtp/gtpv2/ie"
+	"github.com/jbdamiano/go-gtp/gtpv2/ie"
 )
 
 func TestTrafficFlowTemplate(t *testing.T) {

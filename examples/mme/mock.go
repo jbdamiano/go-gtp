@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wmnsk/go-gtp/gtpv1"
-	"github.com/wmnsk/go-gtp/gtpv2"
-	"github.com/wmnsk/go-gtp/gtpv2/ie"
+	"github.com/jbdamiano/go-gtp/gtpv1"
+	"github.com/jbdamiano/go-gtp/gtpv2"
+	"github.com/jbdamiano/go-gtp/gtpv2/ie"
 )
 
 // getPGWIP is to get P-GW's IP address according to APN.

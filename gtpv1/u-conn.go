@@ -17,10 +17,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/jbdamiano/go-gtp/gtpv1/ie"
+	"github.com/jbdamiano/go-gtp/gtpv1/message"
+	v2ie "github.com/jbdamiano/go-gtp/gtpv2/ie"
 	"github.com/vishvananda/netlink"
-	"github.com/wmnsk/go-gtp/gtpv1/ie"
-	"github.com/wmnsk/go-gtp/gtpv1/message"
-	v2ie "github.com/wmnsk/go-gtp/gtpv2/ie"
 )
 
 type tpduSet struct {

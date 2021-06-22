@@ -19,8 +19,8 @@ import (
 	"github.com/vishvananda/netlink"
 	"google.golang.org/grpc"
 
-	"github.com/wmnsk/go-gtp/examples/gw-tester/s1mme"
-	"github.com/wmnsk/go-gtp/gtpv1"
+	"github.com/jbdamiano/go-gtp/examples/gw-tester/s1mme"
+	"github.com/jbdamiano/go-gtp/gtpv1"
 )
 
 type enb struct {
@@ -107,7 +107,7 @@ func (e *enb) run(ctx context.Context) error {
 
 	e.uConn = gtpv1.NewUPlaneConn(e.uAddr)
 	if e.useKernelGTP {
-		if err := e.uConn.EnableKernelGTP("gtp-enb", gtpv1.RoleSGSN); err != nil {
+		if err := e.uConn.EnableKernelGTP("gtp-enb4", gtpv1.RoleSGSN); err != nil {
 			return err
 		}
 	}
@@ -289,6 +289,7 @@ func (e *enb) attach(ctx context.Context, sub *Subscriber) error {
 
 		sub.sgwAddr = rsp.SgwAddr
 		sub.otei = rsp.OTei
+		sub.count = 0
 
 		e.sessions = append(e.sessions, sub)
 		if e.useKernelGTP {
@@ -325,15 +326,36 @@ func (e *enb) newTEID() uint32 {
 func (e *enb) setupUPlane(ctx context.Context, sub *Subscriber) error {
 	switch sub.TrafficType {
 	case "http_get":
+		log.Println("http_get********************")
 		if err := e.addIP(sub); err != nil {
 			return err
 		}
 		if err := e.addRuleLocal(sub); err != nil {
 			return err
 		}
+
 		go func() {
+			log.Println("http_get********************")
 			if err := e.runHTTPProbe(ctx, sub); err != nil {
 				e.errCh <- err
+			}
+			log.Println("ici 2")
+			req := &s1mme.DetachRequest{
+				Imsi: sub.IMSI,
+			}
+
+			rsp, err := e.s1mmeClient.Detach(ctx, req)
+			if err != nil {
+				log.Println("error")
+
+			}
+			switch rsp.Cause {
+			case s1mme.Cause_SUCCESS:
+
+				log.Printf("Successfully released for %s", sub.IMSI)
+
+			default:
+				e.errCh <- fmt.Errorf("got unexpected Cause for %s: %s", rsp.Cause, sub.IMSI)
 			}
 		}()
 	case "external":
@@ -421,6 +443,7 @@ func (e *enb) runHTTPProbe(ctx context.Context, sub *Subscriber) error {
 			return nil
 		case <-time.After(5 * time.Second):
 			// do nothing here and go forward
+			log.Println("http_get do nothing********************")
 		}
 
 		rsp, err := client.Get(sub.HTTPURL)
@@ -428,15 +451,22 @@ func (e *enb) runHTTPProbe(ctx context.Context, sub *Subscriber) error {
 			e.errCh <- fmt.Errorf("failed to GET %s: %w", sub.HTTPURL, err)
 			continue
 		}
-
+		sub.count++
+		if sub.count == 5 {
+			log.Println("End")
+			break
+		}
 		if rsp.StatusCode == http.StatusOK {
+			log.Println("http_get********************ok")
 			log.Printf("[HTTP Probe;%s] Successfully GET %s: Status: %s", sub.IMSI, sub.HTTPURL, rsp.Status)
 			rsp.Body.Close()
 			continue
 		}
 		rsp.Body.Close()
 		e.errCh <- fmt.Errorf("got invalid response on HTTP probe: %v", rsp.StatusCode)
+
 	}
+	return nil
 }
 
 func (e *enb) addIP(sub *Subscriber) error {

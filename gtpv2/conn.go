@@ -16,8 +16,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/wmnsk/go-gtp/gtpv2/ie"
-	"github.com/wmnsk/go-gtp/gtpv2/message"
+	"github.com/jbdamiano/go-gtp/gtpv2/ie"
+	"github.com/jbdamiano/go-gtp/gtpv2/message"
 )
 
 // Conn represents a GTPv2-C connection.

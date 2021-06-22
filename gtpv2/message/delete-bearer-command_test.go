@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/wmnsk/go-gtp/gtpv2/ie"
-	"github.com/wmnsk/go-gtp/gtpv2/message"
-	"github.com/wmnsk/go-gtp/gtpv2/testutils"
+	"github.com/jbdamiano/go-gtp/gtpv2/ie"
+	"github.com/jbdamiano/go-gtp/gtpv2/message"
+	"github.com/jbdamiano/go-gtp/gtpv2/testutils"
 )
 
 func TestDeleteBearerCommand(t *testing.T) {

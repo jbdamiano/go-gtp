@@ -7,9 +7,9 @@ package message_test
 import (
 	"testing"
 
-	"github.com/wmnsk/go-gtp/gtpv2/ie"
-	"github.com/wmnsk/go-gtp/gtpv2/message"
-	"github.com/wmnsk/go-gtp/gtpv2/testutils"
+	"github.com/jbdamiano/go-gtp/gtpv2/ie"
+	"github.com/jbdamiano/go-gtp/gtpv2/message"
+	"github.com/jbdamiano/go-gtp/gtpv2/testutils"
 )
 
 func TestReleaseAccessBearersRequest(t *testing.T) {

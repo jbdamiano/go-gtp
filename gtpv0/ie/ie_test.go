@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/wmnsk/go-gtp/gtpv0"
-	"github.com/wmnsk/go-gtp/gtpv0/ie"
+	"github.com/jbdamiano/go-gtp/gtpv0"
+	"github.com/jbdamiano/go-gtp/gtpv0/ie"
 )
 
 func TestIE(t *testing.T) {

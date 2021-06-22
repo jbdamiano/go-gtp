@@ -5,7 +5,7 @@
 package message
 
 import (
-	"github.com/wmnsk/go-gtp/gtpv1/ie"
+	"github.com/jbdamiano/go-gtp/gtpv1/ie"
 )
 
 // EchoRequest is a EchoRequest Header and its IEs above.

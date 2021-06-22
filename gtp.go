@@ -5,9 +5,9 @@
 package gtp
 
 import (
-	v0msg "github.com/wmnsk/go-gtp/gtpv0/message"
-	v1msg "github.com/wmnsk/go-gtp/gtpv1/message"
-	v2msg "github.com/wmnsk/go-gtp/gtpv2/message"
+	v0msg "github.com/jbdamiano/go-gtp/gtpv0/message"
+	v1msg "github.com/jbdamiano/go-gtp/gtpv1/message"
+	v2msg "github.com/jbdamiano/go-gtp/gtpv2/message"
 )
 
 // Message is an interface that defines all versions of GTP message.

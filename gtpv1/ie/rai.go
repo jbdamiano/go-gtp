@@ -7,7 +7,7 @@ package ie
 import (
 	"encoding/binary"
 
-	"github.com/wmnsk/go-gtp/utils"
+	"github.com/jbdamiano/go-gtp/utils"
 )
 
 // NewRouteingAreaIdentity creates a new RouteingAreaIdentity IE.

@@ -9,7 +9,7 @@ A pseudo eNB and MME as a tester for S/P-GW.
 It is a burden to use actual UE/eNB/MME just to test S/P-GW, isn't it?  
 GW Tester emulates the minimal required behavior of surrounding nodes to perform quick and simple testing on S/P-GW.
 
-A blog post by the author is available [here](https://wmnsk.com/posts/20200116_gw-tester/) for those who are interested in :)  
+A blog post by the author is available [here](https://jbdamiano.com/posts/20200116_gw-tester/) for those who are interested in :)  
 _NOTE: Some of the blog post's configurations or codes might be no longer relevant in the current version._
 
 ## How it works
@@ -25,7 +25,7 @@ Communication over the S1-MME interface is done with protobuf/gRPC instead of th
 Looking for a Go package for LTE authentication?
 MILENAGE algorithm implementation is available :)
 
-https://github.com/wmnsk/milenage
+https://github.com/jbdamiano/milenage
 ```
 
 ### Gateway Selection
@@ -68,8 +68,8 @@ Just `go get` eNB and MME.
 Functional S-GW and P-GW are also available in the same directory if you need them.
 
 ```shell-session
-go get github.com/wmnsk/go-gtp/examples/gw-tester/enb
-go get github.com/wmnsk/go-gtp/examples/gw-tester/mme
+go get github.com/jbdamiano/go-gtp/examples/gw-tester/enb
+go get github.com/jbdamiano/go-gtp/examples/gw-tester/mme
 ```
 
 And run them with YAML configuration. See [Configuration](#configurations) section for details.
@@ -211,7 +211,7 @@ The programs can handle `SIGHUP` to reload config without deleting sessions. Upd
 
 ### Instrumentation
 
-GW Tester nodes expose some metrics for Prometheus if `prom_addr` is given in each config. You can see the sample response from each node in [this Gist](https://gist.github.com/wmnsk/72f6d2d2450452090cd6351ffe63f660).  
+GW Tester nodes expose some metrics for Prometheus if `prom_addr` is given in each config. You can see the sample response from each node in [this Gist](https://gist.github.com/jbdamiano/72f6d2d2450452090cd6351ffe63f660).  
 I'm planning to add some more metrics like "success rate of HTTP probe", etc.
 
 | Metrics           | Name                                  | Description                                   |

@@ -12,9 +12,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/wmnsk/go-gtp/gtpv2"
-	"github.com/wmnsk/go-gtp/gtpv2/ie"
-	"github.com/wmnsk/go-gtp/gtpv2/message"
+	"github.com/jbdamiano/go-gtp/gtpv2"
+	"github.com/jbdamiano/go-gtp/gtpv2/ie"
+	"github.com/jbdamiano/go-gtp/gtpv2/message"
 )
 
 func setup(ctx context.Context, doneCh chan struct{}) (cliConn, srvConn *gtpv2.Conn, err error) {

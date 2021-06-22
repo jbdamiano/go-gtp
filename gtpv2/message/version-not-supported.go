@@ -7,7 +7,7 @@ package message
 import (
 	"errors"
 
-	"github.com/wmnsk/go-gtp/gtpv2/ie"
+	"github.com/jbdamiano/go-gtp/gtpv2/ie"
 )
 
 // VersionNotSupportedIndication is a VersionNotSupportedIndication Header and its IEs above.

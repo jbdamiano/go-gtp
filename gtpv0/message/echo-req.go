@@ -7,7 +7,7 @@ package message
 import (
 	"fmt"
 
-	"github.com/wmnsk/go-gtp/gtpv0/ie"
+	"github.com/jbdamiano/go-gtp/gtpv0/ie"
 )
 
 // EchoRequest is a EchoRequest Header and its AdditionalIEs above.

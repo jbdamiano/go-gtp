@@ -35,7 +35,7 @@ if err := srvConn.ListenAndServe(ctx); err != nil {
 
 ### Handling incoming messages
 
-Prepare functions that comform to [`HandlerFunc`](https://pkg.go.dev/github.com/wmnsk/go-gtp/gtpv2#Conn.AddHandler), and register them to `Conn` with `AddHandler`. This should be done as soon as you get `Conn` not to miss the incoming messages.
+Prepare functions that comform to [`HandlerFunc`](https://pkg.go.dev/github.com/jbdamiano/go-gtp/gtpv2#Conn.AddHandler), and register them to `Conn` with `AddHandler`. This should be done as soon as you get `Conn` not to miss the incoming messages.
 
 `HandlerFunc` is to handle the incoming messages by message type. See [example](../examples) for how it is like.  
 Also consider using `AddHandlers` when you have many `HandlerFunc`s.

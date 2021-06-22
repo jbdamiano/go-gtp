@@ -1,4 +1,4 @@
-mcc: "001"
+mcc: "208"
 mnc: "01"
 rat_type: 6 # E-UTRAN
 tai: 0x0001
@@ -7,53 +7,53 @@ local_addresses:
   s1c_ip: "127.0.1.11"
   s1u_ip: "127.0.0.11"
 mme_addr: "127.0.1.12:36412"
-use_kernel_gtp: false
+use_kernel_gtp: true
 prom_addr: "127.0.10.1:58080"
 subscribers:
   - imsi: "001010000000001"
     msisdn: "814000000001"
-    imeisv: "1234500000001"
-    src_ip: "192.168.101.201"
+    imeisv: "12345000000001"
+    src_ip: "192.169.0.201"
     i_tei: 1
     type: "http_get"
     euu_if_name: "lo"
-    http_url: "http://172.16.0.102/"
+    http_url: "http://192.169.0.1/"
     reattach_on_reload: false
   - imsi: "001010000000002"
     msisdn: "814000000002"
     imeisv: "1234500000002"
-    src_ip: "192.168.101.202"
+    src_ip: "192.169.0.202"
     i_tei: 0
     type: "http_get"
     euu_if_name: "lo"
-    http_url: "http://172.16.0.102/"
+    http_url: "http://192.169.0.1/"
     reattach_on_reload: true
   - imsi: "001010000000003"
     msisdn: "814000000003"
     imeisv: "1234500000003"
-    src_ip: "192.168.101.203"
+    src_ip: "192.169.0.203"
     i_tei: 0
     type: "http_get"
     euu_if_name: "lo"
-    http_url: "http://172.16.0.102/"
+    http_url: "http://192.169.0.1/"
     reattach_on_reload: false
   - imsi: "001010000000004"
     msisdn: "814000000004"
     imeisv: "1234500000004"
-    src_ip: "192.168.101.204"
+    src_ip: "192.169.0.204"
     i_tei: 0
     type: "http_get"
     euu_if_name: "lo"
-    http_url: "http://172.16.0.102/"
+    http_url: "http://192.169.0.1/"
     reattach_on_reload: true
   - imsi: "001010000000005"
     msisdn: "814000000005"
     imeisv: "1234500000005"
-    src_ip: "192.168.101.205"
+    src_ip: "192.169.0.205"
     i_tei: 0
     type: "http_get"
     euu_if_name: "lo"
-    http_url: "http://172.16.0.102/"
+    http_url: "http://192.169.0.1/"
     reattach_on_reload: false
   # example for external client
   #- imsi: "001010000000006"

@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/wmnsk/go-gtp/gtpv2"
-	"github.com/wmnsk/go-gtp/gtpv2/ie"
+	"github.com/jbdamiano/go-gtp/gtpv2"
+	"github.com/jbdamiano/go-gtp/gtpv2/ie"
 )
 
 var (

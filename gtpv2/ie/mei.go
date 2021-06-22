@@ -8,7 +8,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/wmnsk/go-gtp/utils"
+	"github.com/jbdamiano/go-gtp/utils"
 )
 
 // NewMobileEquipmentIdentity creates a new MobileEquipmentIdentity IE.

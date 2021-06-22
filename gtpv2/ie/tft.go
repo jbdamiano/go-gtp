@@ -10,7 +10,7 @@ import (
 	"io"
 	"net"
 
-	"github.com/wmnsk/go-gtp/utils"
+	"github.com/jbdamiano/go-gtp/utils"
 )
 
 // TrafficFlowTemplate returns TrafficFlowTemplate struct if the type of IE matches.

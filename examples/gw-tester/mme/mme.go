@@ -15,10 +15,10 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
 
-	"github.com/wmnsk/go-gtp/examples/gw-tester/s1mme"
-	"github.com/wmnsk/go-gtp/gtpv2"
-	"github.com/wmnsk/go-gtp/gtpv2/ie"
-	"github.com/wmnsk/go-gtp/gtpv2/message"
+	"github.com/jbdamiano/go-gtp/examples/gw-tester/s1mme"
+	"github.com/jbdamiano/go-gtp/gtpv2"
+	"github.com/jbdamiano/go-gtp/gtpv2/ie"
+	"github.com/jbdamiano/go-gtp/gtpv2/message"
 )
 
 // Session represents a subscriber.
