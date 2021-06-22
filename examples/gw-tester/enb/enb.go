@@ -348,14 +348,15 @@ func (e *enb) setupUPlane(ctx context.Context, sub *Subscriber) error {
 			if err != nil {
 				log.Println("error")
 
-			}
-			switch rsp.Cause {
-			case s1mme.Cause_SUCCESS:
+			} else {
+				switch rsp.Cause {
+				case s1mme.Cause_SUCCESS:
 
-				log.Printf("Successfully released for %s", sub.IMSI)
+					log.Printf("Successfully released for %s", sub.IMSI)
 
-			default:
-				e.errCh <- fmt.Errorf("got unexpected Cause for %s: %s", rsp.Cause, sub.IMSI)
+				default:
+					e.errCh <- fmt.Errorf("got unexpected Cause for %s: %s", rsp.Cause, sub.IMSI)
+				}
 			}
 		}()
 	case "external":
@@ -452,15 +453,18 @@ func (e *enb) runHTTPProbe(ctx context.Context, sub *Subscriber) error {
 			continue
 		}
 		sub.count++
-		if sub.count == 5 {
+		log.Printf("count is %d", sub.count)
+		if sub.count < 5 {
 			log.Println("End")
-			break
+			return nil
 		}
 		if rsp.StatusCode == http.StatusOK {
 			log.Println("http_get********************ok")
 			log.Printf("[HTTP Probe;%s] Successfully GET %s: Status: %s", sub.IMSI, sub.HTTPURL, rsp.Status)
 			rsp.Body.Close()
 			continue
+		} else {
+			return nil
 		}
 		rsp.Body.Close()
 		e.errCh <- fmt.Errorf("got invalid response on HTTP probe: %v", rsp.StatusCode)
