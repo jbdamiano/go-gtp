@@ -7,6 +7,7 @@ package gtpv1
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net"
 
 	"github.com/vishvananda/netlink"
@@ -60,8 +61,15 @@ func (u *UPlaneConn) EnableKernelGTP(devname string, role Role) error {
 	}
 
 	if err := netlink.LinkAdd(u.KernelGTP.Link); err != nil {
-		_ = f.Close()
-		return fmt.Errorf("failed to add device %s: %w", u.KernelGTP.Link.Name, err)
+		log.Printf("Add error try to delete first %v", err)
+		if err := netlink.LinkDel(u.KernelGTP.Link); err != nil {
+			_ = f.Close()
+			return fmt.Errorf("failed to delete device %s: %w", u.KernelGTP.Link.Name, err)
+		}
+		if err := netlink.LinkAdd(u.KernelGTP.Link); err != nil {
+			_ = f.Close()
+			return fmt.Errorf("failed to add device %s: %w", u.KernelGTP.Link.Name, err)
+		}
 	}
 	if err := netlink.LinkSetUp(u.KernelGTP.Link); err != nil {
 		_ = f.Close()

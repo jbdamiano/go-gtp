@@ -107,7 +107,7 @@ func (e *enb) run(ctx context.Context) error {
 
 	e.uConn = gtpv1.NewUPlaneConn(e.uAddr)
 	if e.useKernelGTP {
-		if err := e.uConn.EnableKernelGTP("gtp-enb4", gtpv1.RoleSGSN); err != nil {
+		if err := e.uConn.EnableKernelGTP("gtp-enb", gtpv1.RoleSGSN); err != nil {
 			return err
 		}
 	}
@@ -250,6 +250,7 @@ func (e *enb) detach(ctx context.Context, sub *Subscriber) error {
 	log.Println("send detach request")
 	rsp, err := e.s1mmeClient.Detach(ctx, req)
 	if err != nil {
+		log.Printf("error in detach  %x", err)
 		return err
 	}
 	if e.mc != nil {
@@ -459,7 +460,8 @@ func (e *enb) runHTTPProbe(ctx context.Context, sub *Subscriber) error {
 		rsp, err := client.Get(sub.HTTPURL)
 		if err != nil {
 			e.errCh <- fmt.Errorf("failed to GET %s: %w", sub.HTTPURL, err)
-			continue
+			log.Println("End")
+			return nil
 		}
 		sub.count++
 		log.Printf("count is %d", sub.count)

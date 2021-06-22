@@ -32,6 +32,11 @@ type Session struct {
 	itei uint32
 }
 
+type Sub struct {
+	teid    uint32
+	session *gtpv2.Session
+}
+
 type mme struct {
 	s1mmeListener net.Listener
 	s11Addr       net.Addr
@@ -40,9 +45,12 @@ type mme struct {
 
 	created  chan struct{}
 	modified chan struct{}
+	deleted  chan struct{}
 
 	apn      string
 	mcc, mnc string
+
+	teid map[string]Sub
 
 	enb struct {
 		mcc   string
@@ -88,6 +96,7 @@ func newMME(cfg *Config) (*mme, error) {
 		return nil, err
 	}
 	m.s11IP = cfg.LocalAddrs.S11IP
+	m.teid = make(map[string]Sub)
 
 	// setup gRPC server
 	m.s1mmeListener, err = net.Listen("tcp", cfg.LocalAddrs.S1CAddr)
@@ -225,6 +234,12 @@ func (m *mme) Attach(ctx context.Context, req *s1mme.AttachRequest) (*s1mme.Atta
 			return
 		}
 
+		var subscriber Sub
+		subscriber.teid = s1teid
+		subscriber.session = session
+
+		m.teid[req.Imsi] = subscriber
+
 		rspCh <- &s1mme.AttachResponse{
 			Cause:   s1mme.Cause_SUCCESS,
 			SgwAddr: m.sgw.s1uIP + gtpv2.GTPUPort,
@@ -242,8 +257,59 @@ func (m *mme) Attach(ctx context.Context, req *s1mme.AttachRequest) (*s1mme.Atta
 
 // Detach is called by eNB by gRPC.
 func (m *mme) Detach(ctx context.Context, req *s1mme.DetachRequest) (*s1mme.DetachResponse, error) {
-	// TODO: implement
-	return nil, nil
+	sess := &Session{
+		IMSI: req.Imsi,
+	}
+
+	var teid = m.teid[req.Imsi].teid
+	var session = m.teid[req.Imsi].session
+
+	errCh := make(chan error, 1)
+	rspCh := make(chan *s1mme.DetachResponse)
+	go func() {
+
+		_, err := m.DeleteSession(teid, sess, session)
+		if err != nil {
+			errCh <- err
+			return
+		}
+		log.Printf("Sent Detach Session Request for %s", teid)
+
+		select {
+		case <-m.deleted:
+			// go forward
+		case <-time.After(5 * time.Second):
+			errCh <- fmt.Errorf("timed out: %s", teid)
+		}
+
+		rspCh <- &s1mme.DetachResponse{
+			Cause: s1mme.Cause_SUCCESS,
+		}
+	}()
+
+	select {
+	case err := <-errCh:
+		return nil, err
+	case rsp := <-rspCh:
+		return rsp, nil
+	}
+}
+
+func (m *mme) DeleteSession(teid uint32, sess *Session, session *gtpv2.Session) (uint32, error) {
+
+	nteid, err := session.GetTEID(gtpv2.IFTypeS11S4SGWGTPC)
+	if err != nil {
+		return 0, err
+	}
+
+	oteid, err := m.s11Conn.DeleteSession(
+		nteid, session,
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	return oteid, nil
 }
 
 func (m *mme) CreateSession(sess *Session) (*gtpv2.Session, error) {
