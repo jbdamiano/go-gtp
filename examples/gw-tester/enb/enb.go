@@ -157,6 +157,7 @@ func (e *enb) run(ctx context.Context) error {
 			return nil
 		case sub := <-e.attachCh:
 			go func() {
+				log.Println("e.attach channel")
 				if err := e.attach(ctx, sub); err != nil {
 					log.Printf("Failed to attach: %s: %s", sub, err)
 				}
@@ -241,12 +242,36 @@ func (e *enb) close() error {
 	return fmt.Errorf("errors while closing eNB: %v", errs)
 }
 
+func (e *enb) detach(ctx context.Context, sub *Subscriber) error {
+	log.Println("detach request")
+	req := &s1mme.DetachRequest{
+		Imsi: sub.IMSI,
+	}
+	log.Println("send detach request")
+	rsp, err := e.s1mmeClient.Detach(ctx, req)
+	if err != nil {
+		return err
+	}
+	if e.mc != nil {
+		e.mc.messagesSent.WithLabelValues(e.mmeAddr.String(), "Attach Request").Inc()
+		e.mc.messagesReceived.WithLabelValues(e.mmeAddr.String(), "Attach Response").Inc()
+	}
+	switch rsp.Cause {
+	case s1mme.Cause_SUCCESS:
+		log.Printf("Successfully established tunnel for %s", sub.IMSI)
+	default:
+		e.errCh <- fmt.Errorf("got unexpected Cause for %s: %s", rsp.Cause, sub.IMSI)
+		return nil
+	}
+	return nil
+}
+
 func (e *enb) attach(ctx context.Context, sub *Subscriber) error {
 	// allocate random TEID if 0 is specified in config.
 	if sub.ITEI == 0 {
 		sub.ITEI = e.newTEID()
 	}
-
+	log.Println("attach request")
 	req := &s1mme.AttachRequest{
 		Imsi:     sub.IMSI,
 		Msisdn:   sub.MSISDN,
@@ -340,25 +365,8 @@ func (e *enb) setupUPlane(ctx context.Context, sub *Subscriber) error {
 				e.errCh <- err
 			}
 			log.Println("ici 2")
-			req := &s1mme.DetachRequest{
-				Imsi: sub.IMSI,
-			}
+			e.detach(ctx, sub)
 
-			rsp, err := e.s1mmeClient.Detach(ctx, req)
-			if err != nil {
-				log.Printf("error %w", err)
-				e.errCh <- err
-
-			} else {
-				switch rsp.Cause {
-				case s1mme.Cause_SUCCESS:
-
-					log.Printf("Successfully released for %s", sub.IMSI)
-
-				default:
-					e.errCh <- fmt.Errorf("got unexpected Cause for %s: %s", rsp.Cause, sub.IMSI)
-				}
-			}
 		}()
 	case "external":
 		if err := e.addRuleExternal(sub); err != nil {
