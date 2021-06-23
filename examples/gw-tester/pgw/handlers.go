@@ -6,6 +6,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"strings"
@@ -138,9 +139,23 @@ func (p *pgw) handleCreateSessionRequest(c *gtpv2.Conn, sgwAddr net.Addr, msg me
 	}
 
 	if paaIE := csReqFromSGW.PAA; paaIE != nil {
-		bearer.SubscriberIP, err = paaIE.IPAddress()
-		if err != nil {
-			return err
+		if p.dynamic {
+			log.Println("dynamic mode")
+
+			if p.inactive == nil {
+				log.Println("inactive is nil why???")
+				return io.ErrUnexpectedEOF
+			}
+			entry := p.rem_list(false)
+			p.add_list(entry.ip, true)
+
+			bearer.SubscriberIP = entry.ip
+			p.imsis[session.IMSI] = p.active.last
+		} else {
+			bearer.SubscriberIP, err = paaIE.IPAddress()
+			if err != nil {
+				return err
+			}
 		}
 	} else {
 		return &gtpv2.RequiredIEMissingError{Type: ie.PDNAddressAllocation}
@@ -231,6 +246,27 @@ func (p *pgw) handleDeleteSessionRequest(c *gtpv2.Conn, sgwAddr net.Addr, msg me
 		log.Println(err)
 		return nil
 	}
+
+	if p.dynamic {
+
+		entry := p.imsis[session.IMSI]
+
+		if p.active == entry {
+			p.active = entry.nextList
+			if p.active != nil {
+				// all data have been rempved
+				p.active.prevList = nil
+			}
+		} else {
+			if entry.nextList == nil {
+				p.active.last = entry.prevList
+			}
+			entry.prevList.nextList = entry.nextList
+			entry.nextList.prevList = entry.prevList
+		}
+		p.add_list(entry.ip, false)
+	}
+
 	dsr := message.NewDeleteSessionResponse(
 		teid, 0,
 		ie.NewCause(gtpv2.CauseRequestAccepted, 0, 0, 0, nil),

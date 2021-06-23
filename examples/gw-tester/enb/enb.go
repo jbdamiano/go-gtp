@@ -243,11 +243,9 @@ func (e *enb) close() error {
 }
 
 func (e *enb) detach(ctx context.Context, sub *Subscriber) error {
-	log.Println("detach request")
 	req := &s1mme.DetachRequest{
 		Imsi: sub.IMSI,
 	}
-	log.Println("send detach request")
 	rsp, err := e.s1mmeClient.Detach(ctx, req)
 	if err != nil {
 		log.Printf("error in detach  %x", err)
@@ -259,7 +257,7 @@ func (e *enb) detach(ctx context.Context, sub *Subscriber) error {
 	}
 	switch rsp.Cause {
 	case s1mme.Cause_SUCCESS:
-		log.Printf("Successfully established tunnel for %s", sub.IMSI)
+		log.Printf("Successfully removed tunnel for %s", sub.IMSI)
 	default:
 		e.errCh <- fmt.Errorf("got unexpected Cause for %s: %s", rsp.Cause, sub.IMSI)
 		return nil
@@ -272,13 +270,18 @@ func (e *enb) attach(ctx context.Context, sub *Subscriber) error {
 	if sub.ITEI == 0 {
 		sub.ITEI = e.newTEID()
 	}
-	log.Println("attach request")
+	var ip string
+	if sub.dynamic {
+		ip = "0.0.0.0"
+	} else {
+		ip = sub.SrcIP
+	}
 	req := &s1mme.AttachRequest{
 		Imsi:     sub.IMSI,
 		Msisdn:   sub.MSISDN,
 		Imeisv:   sub.IMEISV,
 		S1UAddr:  e.uConn.LocalAddr().String(),
-		SrcIp:    sub.SrcIP,
+		SrcIp:    ip,
 		ITei:     sub.ITEI,
 		Location: e.location,
 	}
@@ -301,9 +304,9 @@ func (e *enb) attach(ctx context.Context, sub *Subscriber) error {
 
 		if e.useKernelGTP {
 			if err := e.uConn.AddTunnelOverride(
-				net.ParseIP(sgwIP), net.ParseIP(req.SrcIp), rsp.OTei, req.ITei,
+				net.ParseIP(sgwIP), net.ParseIP(rsp.SrcIp), rsp.OTei, req.ITei,
 			); err != nil {
-				log.Println(net.ParseIP(sgwIP), net.ParseIP(req.SrcIp), rsp.OTei, req.ITei)
+				log.Println(net.ParseIP(sgwIP), net.ParseIP(rsp.SrcIp), rsp.OTei, req.ITei)
 				e.errCh <- fmt.Errorf("failed to create tunnel for %s: %w", sub.IMSI, err)
 				return nil
 			}
@@ -352,7 +355,6 @@ func (e *enb) newTEID() uint32 {
 func (e *enb) setupUPlane(ctx context.Context, sub *Subscriber) error {
 	switch sub.TrafficType {
 	case "http_get":
-		log.Println("http_get********************")
 		if err := e.addIP(sub); err != nil {
 			return err
 		}
@@ -361,11 +363,9 @@ func (e *enb) setupUPlane(ctx context.Context, sub *Subscriber) error {
 		}
 
 		go func() {
-			log.Println("http_get********************")
 			if err := e.runHTTPProbe(ctx, sub); err != nil {
 				e.errCh <- err
 			}
-			log.Println("ici 2")
 			e.detach(ctx, sub)
 
 		}()
@@ -454,34 +454,28 @@ func (e *enb) runHTTPProbe(ctx context.Context, sub *Subscriber) error {
 			return nil
 		case <-time.After(5 * time.Second):
 			// do nothing here and go forward
-			log.Println("http_get do nothing********************")
 		}
 
 		rsp, err := client.Get(sub.HTTPURL)
 		if err != nil {
 			e.errCh <- fmt.Errorf("failed to GET %s: %w", sub.HTTPURL, err)
-			log.Println("End")
 			return nil
 		}
 		sub.count++
 		log.Printf("count is %d", sub.count)
-		if sub.count > 5 {
-			log.Println("End")
+		if sub.count > sub.max_send {
 			return nil
 		}
 		if rsp.StatusCode == http.StatusOK {
-			log.Println("http_get********************ok")
 			log.Printf("[HTTP Probe;%s] Successfully GET %s: Status: %s", sub.IMSI, sub.HTTPURL, rsp.Status)
 			rsp.Body.Close()
 			continue
 		} else {
+			rsp.Body.Close()
+			e.errCh <- fmt.Errorf("got invalid response on HTTP probe: %v", rsp.StatusCode)
 			return nil
 		}
-		rsp.Body.Close()
-		e.errCh <- fmt.Errorf("got invalid response on HTTP probe: %v", rsp.StatusCode)
-
 	}
-	return nil
 }
 
 func (e *enb) addIP(sub *Subscriber) error {

@@ -13,6 +13,8 @@ subscribers:
   - imsi: "001010000000001"
     msisdn: "814000000001"
     imeisv: "12345000000001"
+    dynamic: true
+    max_send: 5
     src_ip: "192.169.0.201"
     i_tei: 1
     type: "http_get"
@@ -24,6 +26,8 @@ subscribers:
     imeisv: "1234500000002"
     src_ip: "192.169.0.202"
     i_tei: 0
+    dynamic: true
+    max_send: 5
     type: "http_get"
     euu_if_name: "lo"
     http_url: "http://192.169.0.1/"
@@ -33,6 +37,8 @@ subscribers:
     imeisv: "1234500000003"
     src_ip: "192.169.0.203"
     i_tei: 0
+    dynamic: true
+    max_send: 5
     type: "http_get"
     euu_if_name: "lo"
     http_url: "http://192.169.0.1/"
@@ -42,6 +48,8 @@ subscribers:
     imeisv: "1234500000004"
     src_ip: "192.169.0.204"
     i_tei: 0
+    dynamic: true
+    max_send: 5
     type: "http_get"
     euu_if_name: "lo"
     http_url: "http://192.169.0.1/"
@@ -51,6 +59,8 @@ subscribers:
     imeisv: "1234500000005"
     src_ip: "192.169.0.205"
     i_tei: 0
+    dynamic: true
+    max_send: 5
     type: "http_get"
     euu_if_name: "lo"
     http_url: "http://192.169.0.1/"

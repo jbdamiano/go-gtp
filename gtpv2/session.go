@@ -42,6 +42,8 @@ type Session struct {
 	peerAddr       net.Addr
 	peerAddrString string
 
+	ipAddrString string
+
 	// Subscriber is a Subscriber associated with Session.
 	*Subscriber
 }
@@ -59,6 +61,7 @@ func NewSession(peerAddr net.Addr, sub *Subscriber) *Session {
 		bearerMap:      newBearerMap("default", &Bearer{QoSProfile: &QoSProfile{}}),
 		Subscriber:     sub,
 		msgQueue:       make(chan message.Message, 1000),
+		ipAddrString:   "",
 	}
 
 	return s
@@ -114,6 +117,15 @@ func (s *Session) UpdatePeerAddr(peer net.Addr) {
 // instead of users but it is safe to call it.
 func (s *Session) AddTEID(ifType uint8, teid uint32) {
 	s.teidMap.store(ifType, teid)
+}
+
+func (s *Session) AddIp(ip string) {
+	s.ipAddrString = ip
+}
+
+// GetTEID returns TEID associated with InterfaceType given.
+func (s *Session) GetIp() string {
+	return s.ipAddrString
 }
 
 // GetTEID returns TEID associated with InterfaceType given.

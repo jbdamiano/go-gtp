@@ -105,6 +105,19 @@ func (m *mme) handleCreateSessionResponse(c *gtpv2.Conn, sgwAddr net.Addr, msg m
 		return &gtpv2.RequiredIEMissingError{Type: ie.BearerContext}
 	}
 
+	if paaIE := csRspFromSGW.PAA; paaIE != nil {
+		var ip string
+
+		ip, err = paaIE.IPAddress()
+		if err != nil {
+			return err
+		}
+		log.Printf("IP is %s", ip)
+		session.AddIp(ip)
+	} else {
+		return &gtpv2.RequiredIEMissingError{Type: ie.PDNAddressAllocation}
+	}
+
 	if err := session.Activate(); err != nil {
 		c.RemoveSession(session)
 		return err
@@ -191,5 +204,6 @@ func (m *mme) handleDeleteSessionResponse(c *gtpv2.Conn, sgwAddr net.Addr, msg m
 
 	c.RemoveSession(session)
 	log.Printf("Session deleted with S-GW for Subscriber: %s", session.IMSI)
+	m.deleted <- struct{}{}
 	return nil
 }

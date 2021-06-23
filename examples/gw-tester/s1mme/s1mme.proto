@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package s1mme;
 
+option go_package = "./s1mme";
+
 // Attacher defines the service to attach UE.
 service Attacher {
     rpc Attach (AttachRequest) returns (AttachResponse) {}
@@ -25,6 +27,7 @@ message AttachResponse {
     Cause cause = 1; // result
     string sgw_addr = 2;
     uint32 o_tei = 3;
+    string src_ip = 4;
 }
 
 // Cause represents a result of attach / detach.

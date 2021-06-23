@@ -83,6 +83,7 @@ func newMME(cfg *Config) (*mme, error) {
 
 		created:  make(chan struct{}, 1),
 		modified: make(chan struct{}, 1),
+		deleted:  make(chan struct{}, 1),
 
 		errCh: make(chan error, 1),
 	}
@@ -244,6 +245,7 @@ func (m *mme) Attach(ctx context.Context, req *s1mme.AttachRequest) (*s1mme.Atta
 			Cause:   s1mme.Cause_SUCCESS,
 			SgwAddr: m.sgw.s1uIP + gtpv2.GTPUPort,
 			OTei:    s1teid,
+			SrcIp:   session.GetIp(),
 		}
 	}()
 

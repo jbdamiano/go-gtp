@@ -41,8 +41,9 @@ type Subscriber struct {
 	TrafficType string `yaml:"type"`
 	EUuIFName   string `yaml:"euu_if_name"`
 	HTTPURL     string `yaml:"http_url"`
-
-	Reattach bool `yaml:"reattach_on_reload"`
+	max_send    uint32 `yaml:"max_send"`
+	dynamic     bool   `yaml:"dynamic"`
+	Reattach    bool   `yaml:"reattach_on_reload"`
 
 	// values for these fields are given from MME.
 	sgwAddr string

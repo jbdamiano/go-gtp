@@ -14,10 +14,19 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/vishvananda/netlink"
 
+	"strconv"
+
 	"github.com/jbdamiano/go-gtp/gtpv1"
 	"github.com/jbdamiano/go-gtp/gtpv2"
 	"github.com/jbdamiano/go-gtp/gtpv2/message"
 )
+
+type list struct {
+	ip       string
+	prevList *list
+	nextList *list
+	last     *list
+}
 
 type pgw struct {
 	cConn *gtpv2.Conn
@@ -34,8 +43,69 @@ type pgw struct {
 
 	promAddr string
 	mc       *metricsCollector
+	dynamic  bool
+
+	inactive *list
+	active   *list
+
+	imsis map[string]*list
 
 	errCh chan error
+}
+
+// push adds another number to the stack
+func add_inactive(p *pgw, addr string) {
+	var current list
+	current.ip = addr
+	current.nextList = nil
+	current.last = nil
+	if p.inactive == nil {
+		p.inactive = &current
+		current.prevList = nil
+	} else {
+		current.prevList = p.inactive.last
+		p.inactive.last.nextList = &current
+	}
+	p.inactive.last = &current
+
+}
+
+func rem_inactive(p *pgw) *list {
+	current := p.inactive
+	p.inactive = current.nextList
+	p.inactive.prevList = nil
+	p.inactive.last = current.last
+	current.last = nil
+	current.nextList = nil
+	current.prevList = nil
+	return current
+}
+
+// push adds another number to the stack
+func add_active(p *pgw, addr string) {
+	var current list
+	current.ip = addr
+	current.nextList = nil
+	current.last = nil
+	if p.active == nil {
+		p.active = &current
+		current.prevList = nil
+	} else {
+		current.prevList = p.active.last
+		p.active.last.nextList = &current
+	}
+	p.active.last = &current
+}
+
+func rem_active(p *pgw) *list {
+	current := p.inactive
+	p.active = current.nextList
+	p.active.prevList = nil
+	p.active.last = current.last
+	current.last = nil
+	current.nextList = nil
+	current.prevList = nil
+	return current
 }
 
 func newPGW(cfg *Config) (*pgw, error) {
@@ -44,14 +114,87 @@ func newPGW(cfg *Config) (*pgw, error) {
 		s5u:          cfg.LocalAddrs.S5UIP + gtpv2.GTPUPort,
 		useKernelGTP: cfg.UseKernelGTP,
 		sgiIF:        cfg.SGiIFName,
+		dynamic:      cfg.Dynamic,
+		inactive:     nil,
+		active:       nil,
 
 		errCh: make(chan error, 1),
 	}
+	p.imsis = make(map[string]*list)
 
 	var err error
+
 	_, p.routeSubnet, err = net.ParseCIDR(cfg.RouteSubnet)
 	if err != nil {
 		return nil, err
+	}
+	if cfg.Dynamic {
+		var i int
+		for i = 0; i < len(cfg.RouteSubnet); i++ {
+			if cfg.RouteSubnet[i] == '/' {
+				break
+			}
+		}
+
+		mask, err := strconv.Atoi(cfg.RouteSubnet[i+1:])
+		if err != nil {
+			return nil, err
+		}
+
+		var nbCtx int
+		if len(p.routeSubnet.IP) == 4 {
+
+			if mask > 24 {
+				nbCtx = (1 << (32 - mask))
+			} else {
+				nbCtx = (25 - mask) * 254
+			}
+			a := p.routeSubnet.IP[0]
+			b := p.routeSubnet.IP[1]
+			c := p.routeSubnet.IP[2]
+			d := p.routeSubnet.IP[3]
+			var start byte
+			if d == 0 {
+				start = d + 1
+			} else {
+				start = d
+			}
+
+			log.Printf("range IPv4 %d.%d.%d.%d start %d nb %d mask %d", a, b, c, d, start, nbCtx, mask)
+			last := start
+
+			for i := 0; i < nbCtx; i++ {
+				addr := fmt.Sprintf("%d.%d.%d.%d", a, b, c, last)
+				last++
+				add_inactive(p, addr)
+				if last == 255 {
+					last = 1
+					c++
+
+					if c == 255 {
+						break
+					}
+				}
+			}
+		} else {
+			if mask < 112 {
+				mask = 112
+			}
+			nbCtx = (1 << (128 - mask))
+			ipv6 := p.routeSubnet.IP
+			for i := 0; i < nbCtx; i++ {
+				addr := ipv6.String()
+				add_inactive(p, addr)
+				ipv6[15] += 1
+				if ipv6[15] == 0 {
+					ipv6[14]++
+
+					if ipv6[14] == 0 {
+						break
+					}
+				}
+			}
+		}
 	}
 
 	if cfg.PromAddr != "" {

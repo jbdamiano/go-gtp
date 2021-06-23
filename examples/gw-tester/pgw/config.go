@@ -24,6 +24,8 @@ type Config struct {
 	RouteSubnet string `yaml:"route_subnet"`
 
 	PromAddr string `yaml:"prom_addr"`
+
+	Dynamic bool `yaml:"dynamic"`
 }
 
 func loadConfig(path string) (*Config, error) {
