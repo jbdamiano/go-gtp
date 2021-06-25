@@ -41,8 +41,8 @@ type Subscriber struct {
 	TrafficType string `yaml:"type"`
 	EUuIFName   string `yaml:"euu_if_name"`
 	HTTPURL     string `yaml:"http_url"`
-	max_send    uint32 `yaml:"max_send"`
-	dynamic     bool   `yaml:"dynamic"`
+	MaxSend     uint32 `yaml:"max_send"`
+	Dynamic     bool   `yaml:"dynamic"`
 	Reattach    bool   `yaml:"reattach_on_reload"`
 
 	// values for these fields are given from MME.
@@ -54,8 +54,8 @@ type Subscriber struct {
 // String returns the information of s in string.
 func (s *Subscriber) String() string {
 	return fmt.Sprintf(
-		"IMSI: %s, MSISDN: %s, IMEISV: %s, SrcIP: %s, S-GW: %s, I_TEI: %#08x, O_TEI: %#08x",
-		s.IMSI, s.MSISDN, s.IMEISV, s.SrcIP, s.sgwAddr, s.ITEI, s.otei,
+		"IMSI: %s, MSISDN: %s, IMEISV: %s, SrcIP: %s, S-GW: %s, I_TEI: %#08x, O_TEI: %#08x, dynamic: %d",
+		s.IMSI, s.MSISDN, s.IMEISV, s.SrcIP, s.sgwAddr, s.ITEI, s.otei, s.Dynamic,
 	)
 }
 

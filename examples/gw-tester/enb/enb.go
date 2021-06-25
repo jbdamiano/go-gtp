@@ -271,11 +271,13 @@ func (e *enb) attach(ctx context.Context, sub *Subscriber) error {
 		sub.ITEI = e.newTEID()
 	}
 	var ip string
-	if sub.dynamic {
+	if sub.Dynamic {
 		ip = "0.0.0.0"
 	} else {
 		ip = sub.SrcIP
 	}
+
+	log.Printf("IP is %d", ip)
 	req := &s1mme.AttachRequest{
 		Imsi:     sub.IMSI,
 		Msisdn:   sub.MSISDN,
@@ -463,7 +465,7 @@ func (e *enb) runHTTPProbe(ctx context.Context, sub *Subscriber) error {
 		}
 		sub.count++
 		log.Printf("count is %d", sub.count)
-		if sub.count > sub.max_send {
+		if sub.count > sub.MaxSend {
 			return nil
 		}
 		if rsp.StatusCode == http.StatusOK {
