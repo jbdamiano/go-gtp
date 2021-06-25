@@ -277,7 +277,6 @@ func (e *enb) attach(ctx context.Context, sub *Subscriber) error {
 		ip = sub.SrcIP
 	}
 
-	log.Printf("IP is %d", ip)
 	req := &s1mme.AttachRequest{
 		Imsi:     sub.IMSI,
 		Msisdn:   sub.MSISDN,
@@ -318,6 +317,8 @@ func (e *enb) attach(ctx context.Context, sub *Subscriber) error {
 			}
 		}
 
+		sub.SrcIP = rsp.SrcIp
+
 		sub.sgwAddr = rsp.SgwAddr
 		sub.otei = rsp.OTei
 		sub.count = 0
@@ -328,7 +329,7 @@ func (e *enb) attach(ctx context.Context, sub *Subscriber) error {
 				e.errCh <- fmt.Errorf("failed to setup U-Plane for %s: %w", sub.IMSI, err)
 				return nil
 			}
-			log.Printf("Successfully established tunnel for %s", sub.IMSI)
+			log.Printf("Successfully established tunnel for %s with IP %s", sub.IMSI, sub.SrcIP)
 		}
 	default:
 		e.errCh <- fmt.Errorf("got unexpected Cause for %s: %s", rsp.Cause, sub.IMSI)
