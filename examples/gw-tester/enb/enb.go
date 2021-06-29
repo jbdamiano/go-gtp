@@ -459,18 +459,16 @@ func (e *enb) runHTTPProbe(ctx context.Context, sub *Subscriber) error {
 			// do nothing here and go forward
 		}
 
-		sub.count++
-		log.Printf("count is %d", sub.count)
-		if sub.count > sub.MaxSend {
-			return nil
-		}
-
 		rsp, err := client.Get(sub.HTTPURL)
 		if err != nil {
 			e.errCh <- fmt.Errorf("failed to GET %s: %w", sub.HTTPURL, err)
 			return nil
 		}
-
+		sub.count++
+		log.Printf("count is %d", sub.count)
+		if sub.count > sub.MaxSend {
+			return nil
+		}
 		if rsp.StatusCode == http.StatusOK {
 			log.Printf("[HTTP Probe;%s] Successfully GET %s: Status: %s", sub.IMSI, sub.HTTPURL, rsp.Status)
 			rsp.Body.Close()
