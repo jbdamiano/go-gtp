@@ -448,7 +448,7 @@ func (e *enb) runHTTPProbe(ctx context.Context, sub *Subscriber) error {
 	dialer := net.Dialer{LocalAddr: laddr}
 	client := http.Client{
 		Transport: &http.Transport{Dial: dialer.Dial},
-		Timeout:   3 * time.Second,
+		Timeout:   10 * time.Second,
 	}
 
 	for {
