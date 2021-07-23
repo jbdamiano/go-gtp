@@ -75,7 +75,7 @@ func (u *UPlaneConn) EnableKernelGTP(devname string, role Role) error {
 		_ = f.Close()
 		return fmt.Errorf("failed to setup device %s: %w", u.KernelGTP.Link.Name, err)
 	}
-	if err := netlink.LinkSetMTU(u.KernelGTP.Link, 1500); err != nil {
+	if err := netlink.LinkSetMTU(u.KernelGTP.Link, 1600); err != nil {
 		_ = f.Close()
 		return fmt.Errorf("failed to set MTU for device %s: %w", u.KernelGTP.Link.Name, err)
 	}
