@@ -186,7 +186,7 @@ func (u *UPlaneConn) serve(ctx context.Context) error {
 		}
 	}()
 
-	buf := make([]byte, 1500)
+	buf := make([]byte, 1600)
 	for {
 		select {
 		case <-ctx.Done():

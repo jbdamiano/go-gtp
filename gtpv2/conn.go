@@ -103,7 +103,7 @@ func Dial(ctx context.Context, laddr, raddr net.Addr, localIfType, counter uint8
 		return nil, err
 	}
 
-	buf := make([]byte, 1500)
+	buf := make([]byte, 1600)
 
 	// if no response coming within 3 seconds, returns error without retrying.
 	if err := c.pktConn.SetReadDeadline(time.Now().Add(3 * time.Second)); err != nil {
@@ -177,7 +177,7 @@ func (c *Conn) Serve(ctx context.Context) error {
 		}
 	}()
 
-	buf := make([]byte, 1500)
+	buf := make([]byte, 1600)
 	for {
 		n, raddr, err := c.pktConn.ReadFrom(buf)
 		if err != nil {
