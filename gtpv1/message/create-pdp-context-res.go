@@ -131,9 +131,11 @@ func (c *CreatePDPContextResponse) Marshal() ([]byte, error) {
 
 // MarshalTo puts the byte sequence in the byte array given as b.
 func (c *CreatePDPContextResponse) MarshalTo(b []byte) error {
-	if len(b) < c.MarshalLen() {
-		return ErrTooShortToMarshal
+
+	if c.Header.Payload != nil {
+		c.Header.Payload = nil
 	}
+
 	c.Header.Payload = make([]byte, c.MarshalLen()-c.Header.MarshalLen())
 
 	offset := 0
@@ -518,4 +520,8 @@ func (c *CreatePDPContextResponse) MessageTypeName() string {
 // TEID returns the TEID in human-readable string.
 func (c *CreatePDPContextResponse) TEID() uint32 {
 	return c.Header.TEID
+}
+
+func (c *CreatePDPContextResponse) PayloadLen() int {
+	return len(c.Payload)
 }

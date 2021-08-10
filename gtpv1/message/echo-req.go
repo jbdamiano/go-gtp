@@ -37,6 +37,10 @@ func NewEchoRequest(seq uint16, ies ...*ie.IE) *EchoRequest {
 	return e
 }
 
+func (c *EchoRequest) PayloadLen() int {
+	return len(c.Payload)
+}
+
 // Marshal returns the byte sequence generated from a EchoRequest.
 func (e *EchoRequest) Marshal() ([]byte, error) {
 	b := make([]byte, e.MarshalLen())

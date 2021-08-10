@@ -35,11 +35,12 @@ func (t *TPDU) Marshal() ([]byte, error) {
 	return b, nil
 }
 
+func (c *TPDU) PayloadLen() int {
+	return len(c.Payload)
+}
+
 // MarshalTo puts the byte sequence in the byte array given as b.
 func (t *TPDU) MarshalTo(b []byte) error {
-	if len(b) < t.MarshalLen() {
-		return ErrTooShortToMarshal
-	}
 
 	t.Header.SetLength()
 	return t.Header.MarshalTo(b)

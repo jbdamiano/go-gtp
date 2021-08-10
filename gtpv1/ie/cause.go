@@ -4,7 +4,9 @@
 
 package ie
 
-import "io"
+import (
+	"io"
+)
 
 // NewCause creates a new Cause IE.
 func NewCause(cause uint8) *IE {

@@ -482,9 +482,36 @@ func (u *UPlaneConn) RespondTo(raddr net.Addr, received, toBeSent message.Messag
 	return nil
 }
 
+func (c *UPlaneConn) NewSenderFTEID() (fteidIE *ie.IE) {
+	return nil
+}
+
 // Restarts returns the number of restarts in uint8.
 func (u *UPlaneConn) Restarts() uint8 {
 	return 0
+}
+
+// GetSessionByTEID returns Session looked up by TEID and sender of the message.
+func (c *UPlaneConn) GetSessionByTEID(teid uint32, peer net.Addr) (*Session, error) {
+
+	return nil, nil
+}
+
+func (c *UPlaneConn) GetSessionByIMSI(imsi string) (*Session, error) {
+	return nil, nil
+}
+
+// RemoveSession removes a session registered in a Conn.
+func (c *UPlaneConn) RemoveSession(session *Session) {
+}
+func (c *UPlaneConn) NewSenderCTEID() (fteidIE *ie.IE) {
+	return nil
+}
+func (c *UPlaneConn) NewSenderUTEID() (fteidIE *ie.IE) {
+	return nil
+}
+
+func (c *UPlaneConn) RegisterSession(itei uint32, session *Session) {
 }
 
 // NewFTEID creates a new GTPv2 F-TEID with random TEID value that is unique within UPlaneConn.

@@ -40,6 +40,10 @@ func NewEchoResponse(seq uint16, ies ...*ie.IE) *EchoResponse {
 	return e
 }
 
+func (c *EchoResponse) PayloadLen() int {
+	return len(c.Payload)
+}
+
 // Marshal returns the byte sequence generated from a EchoResponse.
 func (e *EchoResponse) Marshal() ([]byte, error) {
 	b := make([]byte, e.MarshalLen())

@@ -20,6 +20,10 @@ type DeletePDPContextResponse struct {
 	AdditionalIEs    []*ie.IE
 }
 
+func (c *DeletePDPContextResponse) PayloadLen() int {
+	return len(c.Payload)
+}
+
 // NewDeletePDPContextResponse creates a new GTPv1 DeletePDPContextResponse.
 func NewDeletePDPContextResponse(teid uint32, seq uint16, ies ...*ie.IE) *DeletePDPContextResponse {
 	d := &DeletePDPContextResponse{
@@ -64,8 +68,8 @@ func (d *DeletePDPContextResponse) Marshal() ([]byte, error) {
 
 // MarshalTo puts the byte sequence in the byte array given as b.
 func (d *DeletePDPContextResponse) MarshalTo(b []byte) error {
-	if len(b) < d.MarshalLen() {
-		return ErrTooShortToMarshal
+	if d.Header.Payload != nil {
+		d.Header.Payload = nil
 	}
 	d.Header.Payload = make([]byte, d.MarshalLen()-d.Header.MarshalLen())
 

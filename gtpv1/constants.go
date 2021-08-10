@@ -370,3 +370,14 @@ const (
 	RANAPCauseUnspecifiedFailure
 	RANAPCauseNetworkOptimisation
 )
+
+const (
+	S11MMEGTPC uint8 = iota
+	S11MMEGTPU
+	S11SGWGTPC
+	S11SGWGTPU
+	S5SGWGTPC
+	S5SGWGTPU
+	S5PGWGTPC
+	S5PGWGTPU
+)

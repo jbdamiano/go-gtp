@@ -31,6 +31,10 @@ func NewVersionNotSupported(teid uint32, seq uint16, ie ...*ie.IE) *VersionNotSu
 	return v
 }
 
+func (c *VersionNotSupported) PayloadLen() int {
+	return len(c.Payload)
+}
+
 // Marshal returns the byte sequence generated from a VersionNotSupported.
 func (v *VersionNotSupported) Marshal() ([]byte, error) {
 	b := make([]byte, v.MarshalLen())
@@ -43,8 +47,8 @@ func (v *VersionNotSupported) Marshal() ([]byte, error) {
 
 // MarshalTo puts the byte sequence in the byte array given as b.
 func (v *VersionNotSupported) MarshalTo(b []byte) error {
-	if len(b) < v.MarshalLen() {
-		return ErrTooShortToMarshal
+	if v.Header.Payload != nil {
+		v.Header.Payload = nil
 	}
 	v.Header.Payload = make([]byte, v.MarshalLen()-v.Header.MarshalLen())
 

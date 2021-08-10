@@ -40,6 +40,7 @@ func TestCreatePDPContextRequest(t *testing.T) {
 				ie.NewUserLocationInformationWithSAI("123", "45", 0x1111, 0x2222),
 				ie.NewMSTimeZone(0x00, 0x00),
 			),
+	
 			Serialized: []byte{
 				// Header
 				0x32, 0x10, 0x00, 0x7f, 0x11, 0x22, 0x33, 0x44,

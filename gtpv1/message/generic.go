@@ -28,6 +28,10 @@ func NewGeneric(msgType uint8, teid uint32, seq uint16, ie ...*ie.IE) *Generic {
 	return g
 }
 
+func (c *Generic) PayloadLen() int {
+	return len(c.Payload)
+}
+
 // Marshal returns the byte sequence generated from a Generic.
 func (g *Generic) Marshal() ([]byte, error) {
 	b := make([]byte, g.MarshalLen())

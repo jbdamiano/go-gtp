@@ -101,6 +101,10 @@ func NewUpdatePDPContextResponse(teid uint32, seq uint16, ies ...*ie.IE) *Update
 	return u
 }
 
+func (c *UpdatePDPContextResponse) PayloadLen() int {
+	return len(c.Payload)
+}
+
 // Marshal returns the byte sequence generated from a UpdatePDPContextResponse.
 func (u *UpdatePDPContextResponse) Marshal() ([]byte, error) {
 	b := make([]byte, u.MarshalLen())
@@ -113,8 +117,8 @@ func (u *UpdatePDPContextResponse) Marshal() ([]byte, error) {
 
 // MarshalTo puts the byte sequence in the byte array given as b.
 func (u *UpdatePDPContextResponse) MarshalTo(b []byte) error {
-	if len(b) < u.MarshalLen() {
-		return ErrTooShortToMarshal
+	if u.Header.Payload != nil {
+		u.Header.Payload = nil
 	}
 	u.Header.Payload = make([]byte, u.MarshalLen()-u.Header.MarshalLen())
 

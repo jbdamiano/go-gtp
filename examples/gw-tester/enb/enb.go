@@ -303,6 +303,8 @@ func (e *enb) attach(ctx context.Context, sub *Subscriber) error {
 			return err
 		}
 
+		log.Println(net.ParseIP(sgwIP), net.ParseIP(rsp.SrcIp), rsp.OTei, req.ITei)
+
 		if e.useKernelGTP {
 			if err := e.uConn.AddTunnelOverride(
 				net.ParseIP(sgwIP), net.ParseIP(rsp.SrcIp), rsp.OTei, req.ITei,

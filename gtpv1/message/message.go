@@ -87,6 +87,7 @@ const (
 type Message interface {
 	MarshalTo([]byte) error
 	UnmarshalBinary(b []byte) error
+	PayloadLen() int
 	MarshalLen() int
 	Version() int
 	MessageType() uint8

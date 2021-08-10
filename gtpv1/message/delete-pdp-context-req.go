@@ -23,6 +23,10 @@ type DeletePDPContextRequest struct {
 	AdditionalIEs       []*ie.IE
 }
 
+func (c *DeletePDPContextRequest) PayloadLen() int {
+	return len(c.Payload)
+}
+
 // NewDeletePDPContextRequest creates a new GTPv1 DeletePDPContextRequest.
 func NewDeletePDPContextRequest(teid uint32, seq uint16, ies ...*ie.IE) *DeletePDPContextRequest {
 	d := &DeletePDPContextRequest{
@@ -73,8 +77,8 @@ func (d *DeletePDPContextRequest) Marshal() ([]byte, error) {
 
 // MarshalTo puts the byte sequence in the byte array given as b.
 func (d *DeletePDPContextRequest) MarshalTo(b []byte) error {
-	if len(b) < d.MarshalLen() {
-		return ErrTooShortToMarshal
+	if d.Header.Payload != nil {
+		d.Header.Payload = nil
 	}
 	d.Header.Payload = make([]byte, d.MarshalLen()-d.Header.MarshalLen())
 

@@ -7,6 +7,7 @@ package gtpv1
 import (
 	"net"
 
+	"github.com/jbdamiano/go-gtp/gtpv1/ie"
 	"github.com/jbdamiano/go-gtp/gtpv1/message"
 )
 
@@ -16,4 +17,11 @@ type Conn interface {
 	AddHandler(uint8, HandlerFunc)
 	RespondTo(net.Addr, message.Message, message.Message) error
 	Restarts() uint8
+	GetSessionByTEID(teid uint32, peer net.Addr) (*Session, error)
+	GetSessionByIMSI(imsi string) (*Session, error)
+	RemoveSession(session *Session)
+	NewSenderCTEID() (fteidIE *ie.IE)
+	NewSenderUTEID() (fteidIE *ie.IE)
+	NewSenderFTEID() (fteidIE *ie.IE)
+	RegisterSession(itei uint32, session *Session)
 }

@@ -41,6 +41,10 @@ func NewErrorIndication(teid uint32, seq uint16, ies ...*ie.IE) *ErrorIndication
 	return e
 }
 
+func (c *ErrorIndication) PayloadLen() int {
+	return len(c.Payload)
+}
+
 // Marshal returns the byte sequence generated from a ErrorIndication.
 func (e *ErrorIndication) Marshal() ([]byte, error) {
 	b := make([]byte, e.MarshalLen())
@@ -53,8 +57,8 @@ func (e *ErrorIndication) Marshal() ([]byte, error) {
 
 // MarshalTo puts the byte sequence in the byte array given as b.
 func (e *ErrorIndication) MarshalTo(b []byte) error {
-	if len(b) < e.MarshalLen() {
-		return ErrTooShortToMarshal
+	if e.Header.Payload != nil {
+		e.Header.Payload = nil
 	}
 	e.Header.Payload = make([]byte, e.MarshalLen()-e.Header.MarshalLen())
 

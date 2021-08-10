@@ -169,10 +169,14 @@ func (c *CreatePDPContextRequest) Marshal() ([]byte, error) {
 	return b, nil
 }
 
+func (c *CreatePDPContextRequest) PayloadLen() int {
+	return len(c.Payload)
+}
+
 // MarshalTo puts the byte sequence in the byte array given as b.
 func (c *CreatePDPContextRequest) MarshalTo(b []byte) error {
-	if len(b) < c.MarshalLen() {
-		return ErrTooShortToMarshal
+	if c.Header.Payload != nil {
+		c.Header.Payload = nil
 	}
 	c.Header.Payload = make([]byte, c.MarshalLen()-c.Header.MarshalLen())
 

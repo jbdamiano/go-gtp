@@ -144,6 +144,10 @@ func (h *Header) SetSequenceNumber(seq uint16) {
 	h.SequenceNumber = seq
 }
 
+func (c *Header) PayloadLen() int {
+	return len(c.Payload)
+}
+
 // MarshalLen returns the serial length of Header.
 func (h *Header) MarshalLen() int {
 	l := len(h.Payload) + 8
