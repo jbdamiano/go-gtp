@@ -86,6 +86,7 @@ func newSGW(cfg *Config) (*sgw, error) {
 
 	s.useKernelGTP = cfg.UseKernelGTP
 	s.pgwAddr = cfg.PgwAddr
+	log.Printf("PGW address is %s", s.pgwAddr)
 	if !s.useKernelGTP {
 		log.Println("WARN: U-Plane performance would be significantly less without Kernel GTP")
 	}

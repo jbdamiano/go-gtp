@@ -32,6 +32,9 @@ func (s *sgw) handleCreateSessionRequest(s11Conn gtpv1.Conn, mmeAddr net.Addr, m
 	var pgwAddrString string
 
 	pgwAddrString = s.pgwAddr + gtpv1.GTPCPort
+
+	log.Printf("route to %s", pgwAddrString)
+
 	teid, err := csReqFromMME.TEIDCPlane.TEID()
 	if err != nil {
 		return err
