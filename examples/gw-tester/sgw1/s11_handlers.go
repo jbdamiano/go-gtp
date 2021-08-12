@@ -30,11 +30,8 @@ func (s *sgw) handleCreateSessionRequest(s11Conn gtpv1.Conn, mmeAddr net.Addr, m
 	csReqFromMME := msg.(*message.CreatePDPContextRequest)
 
 	var pgwAddrString string
-	ip, err := csReqFromMME.SGSNAddressForSignalling.IPAddress()
-	if err != nil {
-		return err
-	}
-	pgwAddrString = ip + gtpv1.GTPCPort
+
+	pgwAddrString = s.pgwAddr + gtpv1.GTPCPort
 	teid, err := csReqFromMME.TEIDCPlane.TEID()
 	if err != nil {
 		return err
@@ -160,7 +157,6 @@ func (s *sgw) handleCreateSessionRequest(s11Conn gtpv1.Conn, mmeAddr net.Addr, m
 		return err
 	}
 
-	log.Printf("Wait Answer")
 	incomingMsg, err := s11Session.WaitMessage(seq, 5*time.Second)
 	if err != nil {
 		csRspFromSGW = message.NewCreatePDPContextResponse(
@@ -180,7 +176,6 @@ func (s *sgw) handleCreateSessionRequest(s11Conn gtpv1.Conn, mmeAddr net.Addr, m
 		return err
 	}
 
-	log.Printf("ICI")
 	var csRspFromPGW *message.CreatePDPContextResponse
 	switch m := incomingMsg.(type) {
 	case *message.CreatePDPContextResponse:
@@ -192,10 +187,6 @@ func (s *sgw) handleCreateSessionRequest(s11Conn gtpv1.Conn, mmeAddr net.Addr, m
 		return &gtpv2.RequiredIEMissingError{Type: ie.MSISDN}
 		//return &gtpv2.UnexpectedTypeError{Msg: incomingMsg}
 	}
-
-	log.Printf("ICI")
-	log.Printf("JBD len of c.MarshalLen is %d", csRspFromPGW.MarshalLen())
-	log.Printf("JBD len of c.Header.MarshalLen() is %d", csRspFromPGW.Header.MarshalLen())
 
 	// if everything in CreateSessionResponse seems OK, relay it to MME.
 	//s1usgwFTEID := s.s1uConn.NewSenderUTEID()

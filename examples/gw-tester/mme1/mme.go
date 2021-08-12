@@ -43,6 +43,7 @@ type mme struct {
 	s11Addr       net.Addr
 	s11IP         string
 	s11Conn       *gtpv1.CPlaneConn
+	s1cIP         string
 
 	created  chan struct{}
 	modified chan struct{}
@@ -99,6 +100,11 @@ func newMME(cfg *Config) (*mme, error) {
 	}
 	m.s11IP = cfg.LocalAddrs.S11IP
 	m.teid = make(map[string]Sub)
+
+	m.s1cIP, _, err = net.SplitHostPort(cfg.LocalAddrs.S1CAddr)
+	if err != nil {
+		return nil, err
+	}
 
 	// setup gRPC server
 	m.s1mmeListener, err = net.Listen("tcp", cfg.LocalAddrs.S1CAddr)
@@ -250,15 +256,12 @@ func (m *mme) Attach(ctx context.Context, req *s1mme.AttachRequest) (*s1mme.Atta
 			OTei:    s1teid,
 			SrcIp:   session.GetIp(),
 		}
-
-		log.Printf("Done")
 	}()
 
 	select {
 	case err := <-errCh:
 		return nil, err
 	case rsp := <-rspCh:
-		log.Printf("Done rsp")
 		return rsp, nil
 	}
 }
@@ -301,13 +304,13 @@ func (m *mme) Detach(ctx context.Context, req *s1mme.DetachRequest) (*s1mme.Deta
 			errCh <- err
 			return
 		}
-		log.Printf("Sent Detach Session Request for %s", teid)
+		log.Printf("Sent Detach Session Request for %d", teid)
 
 		select {
 		case <-m.deleted:
 			// go forward
 		case <-time.After(5 * time.Second):
-			errCh <- fmt.Errorf("timed out: %s", teid)
+			errCh <- fmt.Errorf("timed out: %d", teid)
 		}
 
 		rspCh <- &s1mme.DetachResponse{
@@ -365,7 +368,7 @@ func (m *mme) CreateSession(sess *Session) (*gtpv1.Session, error) {
 			ie.NewProtocolConfigurationOptions(
 				0, ie.NewConfigurationProtocolOption(1, []byte{0xde, 0xad, 0xbe, 0xef}),
 			),
-			ie.NewGSNAddress(m.pgw.s5cIP),
+			ie.NewGSNAddress(m.s1cIP),
 			ie.NewGSNAddress(m.s11IP),
 			m.s11Conn.NewSenderCTEID(),
 			m.s11Conn.NewSenderUTEID(),
@@ -387,7 +390,7 @@ func (m *mme) CreateSession(sess *Session) (*gtpv1.Session, error) {
 			ie.NewProtocolConfigurationOptions(
 				0, ie.NewConfigurationProtocolOption(1, []byte{0xde, 0xad, 0xbe, 0xef}),
 			),
-			ie.NewGSNAddress(m.pgw.s5cIP),
+			ie.NewGSNAddress(m.s1cIP),
 			ie.NewGSNAddress(m.s11IP),
 			m.s11Conn.NewSenderCTEID(),
 			m.s11Conn.NewSenderUTEID(),

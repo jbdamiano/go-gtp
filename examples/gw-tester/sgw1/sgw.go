@@ -31,6 +31,8 @@ type sgw struct {
 
 	useKernelGTP bool
 
+	pgwAddr string
+
 	addedRoutes []*netlink.Route
 	addedRules  []*netlink.Rule
 
@@ -83,6 +85,7 @@ func newSGW(cfg *Config) (*sgw, error) {
 	}
 
 	s.useKernelGTP = cfg.UseKernelGTP
+	s.pgwAddr = cfg.PgwAddr
 	if !s.useKernelGTP {
 		log.Println("WARN: U-Plane performance would be significantly less without Kernel GTP")
 	}

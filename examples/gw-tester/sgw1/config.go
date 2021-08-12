@@ -19,6 +19,7 @@ type Config struct {
 		S5UIP string `yaml:"s5u_ip"`
 	} `yaml:"local_addresses"`
 
+	PgwAddr      string `yaml:"pgw_addr"`
 	UseKernelGTP bool   `yaml:"use_kernel_gtp"`
 	PromAddr     string `yaml:"prom_addr"`
 }
