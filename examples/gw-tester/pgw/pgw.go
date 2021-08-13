@@ -54,7 +54,7 @@ type pgw struct {
 }
 
 // push adds another number to the stack
-func add_inactive(p *pgw, addr string) {
+func (p *pgw) add_inactive(addr string) {
 	var current list
 	current.ip = addr
 	current.nextList = nil
@@ -70,7 +70,7 @@ func add_inactive(p *pgw, addr string) {
 
 }
 
-func rem_inactive(p *pgw) *list {
+func (p *pgw) rem_inactive() *list {
 	current := p.inactive
 	p.inactive = current.nextList
 	p.inactive.prevList = nil
@@ -82,7 +82,7 @@ func rem_inactive(p *pgw) *list {
 }
 
 // push adds another number to the stack
-func add_active(p *pgw, addr string) {
+func (p *pgw) add_active(addr string) {
 	var current list
 	current.ip = addr
 	current.nextList = nil
@@ -97,7 +97,7 @@ func add_active(p *pgw, addr string) {
 	p.active.last = &current
 }
 
-func rem_active(p *pgw) *list {
+func (p *pgw) rem_active() *list {
 	current := p.inactive
 	p.active = current.nextList
 	p.active.prevList = nil
@@ -106,6 +106,22 @@ func rem_active(p *pgw) *list {
 	current.nextList = nil
 	current.prevList = nil
 	return current
+}
+
+func (p *pgw) rem_list(active bool) *list {
+	if active {
+		return p.rem_active()
+	} else {
+		return p.rem_inactive()
+	}
+}
+
+func (p *pgw) add_list(ip string, active bool) {
+	if active {
+		p.add_active(ip)
+	} else {
+		p.add_inactive(ip)
+	}
 }
 
 func newPGW(cfg *Config) (*pgw, error) {
@@ -166,7 +182,7 @@ func newPGW(cfg *Config) (*pgw, error) {
 			for i := 0; i < nbCtx; i++ {
 				addr := fmt.Sprintf("%d.%d.%d.%d", a, b, c, last)
 				last++
-				add_inactive(p, addr)
+				p.add_inactive(addr)
 				if last == 255 {
 					last = 1
 					c++
@@ -184,7 +200,7 @@ func newPGW(cfg *Config) (*pgw, error) {
 			ipv6 := p.routeSubnet.IP
 			for i := 0; i < nbCtx; i++ {
 				addr := ipv6.String()
-				add_inactive(p, addr)
+				p.add_inactive(addr)
 				ipv6[15] += 1
 				if ipv6[15] == 0 {
 					ipv6[14]++
