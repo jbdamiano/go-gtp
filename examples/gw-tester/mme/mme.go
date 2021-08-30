@@ -336,7 +336,9 @@ func (m *mme) CreateSession(sess *Session) (*gtpv2.Session, error) {
 
 	var session *gtpv2.Session
 	if m.fteid {
-		fteid := ie.NewFullyQualifiedTEID(gtpv2.IFTypeS1USGWGTPU, sess.itei, m.s11IP, "")
+		log.Printf("mesg with fteid bearer")
+
+		fteid := ie.NewFullyQualifiedTEID(gtpv2.IFTypeS5S8SGWGTPU, sess.itei, m.s11IP, "")
 		session, _, err = m.s11Conn.CreateSession(
 			raddr,
 			ie.NewIMSI(sess.IMSI),
@@ -373,6 +375,7 @@ func (m *mme) CreateSession(sess *Session) (*gtpv2.Session, error) {
 			ie.NewUETimeZone(9*time.Hour, 0),
 		)
 	} else {
+		log.Printf("mesg without fteid bearer")
 		session, _, err = m.s11Conn.CreateSession(
 			raddr,
 			ie.NewIMSI(sess.IMSI),
