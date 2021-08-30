@@ -26,6 +26,7 @@ type Config struct {
 
 	SgwS11 string `yaml:"sgw_s11_ip"`
 	PgwS5C string `yaml:"pgw_s5c_ip"`
+	Fteid bool `yaml:"fteid"`
 }
 
 func loadConfig(path string) (*Config, error) {
