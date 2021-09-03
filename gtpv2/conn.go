@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"strings"
 	"sync"
@@ -767,6 +768,40 @@ func (c *Conn) NewSenderFTEID(v4, v6 string) (fteidIE *ie.IE) {
 		}
 
 		teid = t
+		break
+	}
+
+	if teid == 0 {
+		return nil
+	}
+	return ie.NewFullyQualifiedTEID(c.localIfType, teid, v4, v6)
+}
+
+/// Generate a new FTEDic/ chanhe existing teid
+func (c *Conn) NewReplaceSenderFTEID(v4, v6 string, dteid uint32) (fteidIE *ie.IE) {
+	var teid uint32
+	session, ok := c.iteiSessionMap.load(dteid)
+	if !ok {
+		log.Printf("not registered why ? 0x%x", dteid)
+	}
+	for try := uint32(0); try < 0xffff; try++ {
+		const logEvery = 0xff
+		if try&logEvery == logEvery {
+			logf("Generating NewSenderFTEID crossed tries:%d", try)
+		}
+
+		t := generateRandomUint32()
+		if t == 0 {
+			continue
+		}
+
+		// Try to mark TEID as taken. Fails if something exists
+		if ok := c.iteiSessionMap.tryStore(t, session); !ok {
+			continue
+		}
+
+		teid = t
+		c.iteiSessionMap.delete(dteid)
 		break
 	}
 

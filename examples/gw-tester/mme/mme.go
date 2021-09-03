@@ -91,7 +91,6 @@ func newMME(cfg *Config) (*mme, error) {
 	}
 	m.sgw.s11IP = cfg.SgwS11
 	m.pgw.s5cIP = cfg.PgwS5C
-	m.fteid = cfg.Fteid
 
 	// setup S11 conn
 	var err error
@@ -334,82 +333,39 @@ func (m *mme) CreateSession(sess *Session) (*gtpv2.Session, error) {
 		return nil, err
 	}
 
-	var session *gtpv2.Session
-	if m.fteid {
-		log.Printf("mesg with fteid bearer")
-
-		fteid := ie.NewFullyQualifiedTEID(gtpv2.IFTypeS5S8SGWGTPU, sess.itei, m.s11IP, "")
-		session, _, err = m.s11Conn.CreateSession(
-			raddr,
-			ie.NewIMSI(sess.IMSI),
-			ie.NewMSISDN(sess.MSISDN),
-			ie.NewMobileEquipmentIdentity(sess.IMEISV),
-			ie.NewUserLocationInformationStruct(
-				ie.NewCGI(m.enb.mcc, m.enb.mnc, 0x1111, 0x2222),
-				ie.NewSAI(m.enb.mcc, m.enb.mnc, 0x1111, 0x3333),
-				ie.NewRAI(m.enb.mcc, m.enb.mnc, 0x1111, 0x4444),
-				ie.NewTAI(m.enb.mcc, m.enb.mnc, 0x5555),
-				ie.NewECGI(m.enb.mcc, m.enb.mnc, 0x66666666),
-				ie.NewLAI(m.enb.mcc, m.enb.mnc, 0x1111),
-				ie.NewMENBI(m.enb.mcc, m.enb.mnc, 0x11111111),
-				ie.NewEMENBI(m.enb.mcc, m.enb.mnc, 0x22222222),
-			),
-			ie.NewRATType(gtpv2.RATTypeEUTRAN),
-			ie.NewIndicationFromOctets(0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
-			m.s11Conn.NewSenderFTEID(m.s11IP, ""),
-			ie.NewFullyQualifiedTEID(gtpv2.IFTypeS5S8PGWGTPC, 0, m.pgw.s5cIP, "").WithInstance(1),
-			ie.NewAccessPointName(m.apn),
-			ie.NewSelectionMode(gtpv2.SelectionModeMSorNetworkProvidedAPNSubscribedVerified),
-			ie.NewPDNType(gtpv2.PDNTypeIPv4),
-			ie.NewPDNAddressAllocation(sess.SrcIP),
-			ie.NewAPNRestriction(gtpv2.APNRestrictionNoExistingContextsorRestriction),
-			ie.NewAggregateMaximumBitRate(0, 0),
-			ie.NewBearerContext(
-				ie.NewEPSBearerID(br.EBI),
-				ie.NewBearerQoS(pci, br.PL, pvi, br.QCI, br.MBRUL, br.MBRDL, br.GBRUL, br.GBRDL),
-				fteid,
-				ie.NewPortNumber(2125),
-			),
-			ie.NewFullyQualifiedCSID(m.s11IP, 1),
-			ie.NewServingNetwork(m.mcc, m.mnc),
-			ie.NewUETimeZone(9*time.Hour, 0),
-		)
-	} else {
-		log.Printf("mesg without fteid bearer")
-		session, _, err = m.s11Conn.CreateSession(
-			raddr,
-			ie.NewIMSI(sess.IMSI),
-			ie.NewMSISDN(sess.MSISDN),
-			ie.NewMobileEquipmentIdentity(sess.IMEISV),
-			ie.NewUserLocationInformationStruct(
-				ie.NewCGI(m.enb.mcc, m.enb.mnc, 0x1111, 0x2222),
-				ie.NewSAI(m.enb.mcc, m.enb.mnc, 0x1111, 0x3333),
-				ie.NewRAI(m.enb.mcc, m.enb.mnc, 0x1111, 0x4444),
-				ie.NewTAI(m.enb.mcc, m.enb.mnc, 0x5555),
-				ie.NewECGI(m.enb.mcc, m.enb.mnc, 0x66666666),
-				ie.NewLAI(m.enb.mcc, m.enb.mnc, 0x1111),
-				ie.NewMENBI(m.enb.mcc, m.enb.mnc, 0x11111111),
-				ie.NewEMENBI(m.enb.mcc, m.enb.mnc, 0x22222222),
-			),
-			ie.NewRATType(gtpv2.RATTypeEUTRAN),
-			ie.NewIndicationFromOctets(0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
-			m.s11Conn.NewSenderFTEID(m.s11IP, ""),
-			ie.NewFullyQualifiedTEID(gtpv2.IFTypeS5S8PGWGTPC, 0, m.pgw.s5cIP, "").WithInstance(1),
-			ie.NewAccessPointName(m.apn),
-			ie.NewSelectionMode(gtpv2.SelectionModeMSorNetworkProvidedAPNSubscribedVerified),
-			ie.NewPDNType(gtpv2.PDNTypeIPv4),
-			ie.NewPDNAddressAllocation(sess.SrcIP),
-			ie.NewAPNRestriction(gtpv2.APNRestrictionNoExistingContextsorRestriction),
-			ie.NewAggregateMaximumBitRate(0, 0),
-			ie.NewBearerContext(
-				ie.NewEPSBearerID(br.EBI),
-				ie.NewBearerQoS(pci, br.PL, pvi, br.QCI, br.MBRUL, br.MBRDL, br.GBRUL, br.GBRDL),
-			),
-			ie.NewFullyQualifiedCSID(m.s11IP, 1),
-			ie.NewServingNetwork(m.mcc, m.mnc),
-			ie.NewUETimeZone(9*time.Hour, 0),
-		)
-	}
+	session, _, err := m.s11Conn.CreateSession(
+		raddr,
+		ie.NewIMSI(sess.IMSI),
+		ie.NewMSISDN(sess.MSISDN),
+		ie.NewMobileEquipmentIdentity(sess.IMEISV),
+		ie.NewUserLocationInformationStruct(
+			ie.NewCGI(m.enb.mcc, m.enb.mnc, 0x1111, 0x2222),
+			ie.NewSAI(m.enb.mcc, m.enb.mnc, 0x1111, 0x3333),
+			ie.NewRAI(m.enb.mcc, m.enb.mnc, 0x1111, 0x4444),
+			ie.NewTAI(m.enb.mcc, m.enb.mnc, 0x5555),
+			ie.NewECGI(m.enb.mcc, m.enb.mnc, 0x66666666),
+			ie.NewLAI(m.enb.mcc, m.enb.mnc, 0x1111),
+			ie.NewMENBI(m.enb.mcc, m.enb.mnc, 0x11111111),
+			ie.NewEMENBI(m.enb.mcc, m.enb.mnc, 0x22222222),
+		),
+		ie.NewRATType(gtpv2.RATTypeEUTRAN),
+		ie.NewIndicationFromOctets(0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
+		m.s11Conn.NewSenderFTEID(m.s11IP, ""),
+		ie.NewFullyQualifiedTEID(gtpv2.IFTypeS5S8PGWGTPC, 0, m.pgw.s5cIP, "").WithInstance(1),
+		ie.NewAccessPointName(m.apn),
+		ie.NewSelectionMode(gtpv2.SelectionModeMSorNetworkProvidedAPNSubscribedVerified),
+		ie.NewPDNType(gtpv2.PDNTypeIPv4),
+		ie.NewPDNAddressAllocation(sess.SrcIP),
+		ie.NewAPNRestriction(gtpv2.APNRestrictionNoExistingContextsorRestriction),
+		ie.NewAggregateMaximumBitRate(0, 0),
+		ie.NewBearerContext(
+			ie.NewEPSBearerID(br.EBI),
+			ie.NewBearerQoS(pci, br.PL, pvi, br.QCI, br.MBRUL, br.MBRDL, br.GBRUL, br.GBRDL),
+		),
+		ie.NewFullyQualifiedCSID(m.s11IP, 1),
+		ie.NewServingNetwork(m.mcc, m.mnc),
+		ie.NewUETimeZone(9*time.Hour, 0),
+	)
 
 	if err != nil {
 		return nil, err

@@ -138,6 +138,31 @@ func (s *sgw) handleCreateSessionResponse(s5cConn *gtpv2.Conn, pgwAddr net.Addr,
 	return nil
 }
 
+func (s *sgw) handleModifyBearerResponse(s5cConn *gtpv2.Conn, pgwAddr net.Addr, msg message.Message) error {
+	log.Printf("Received %s from %s", msg.MessageTypeName(), pgwAddr)
+	if s.mc != nil {
+		s.mc.messagesReceived.WithLabelValues(pgwAddr.String(), msg.MessageTypeName()).Inc()
+	}
+
+	s5Session, err := s5cConn.GetSessionByTEID(msg.TEID(), pgwAddr)
+	if err != nil {
+		return err
+	}
+
+	s11Session, err := s.s11Conn.GetSessionByIMSI(s5Session.IMSI)
+	if err != nil {
+		return err
+	}
+
+	if err := gtpv2.PassMessageTo(s11Session, msg, 5*time.Second); err != nil {
+		return err
+	}
+
+	// even the cause indicates failure, session should be removed locally.
+	log.Printf("Modify bearer for Subscriber: %s", s5Session.IMSI)
+	return nil
+}
+
 func (s *sgw) handleDeleteSessionResponse(s5cConn *gtpv2.Conn, pgwAddr net.Addr, msg message.Message) error {
 	log.Printf("Received %s from %s", msg.MessageTypeName(), pgwAddr)
 	if s.mc != nil {

@@ -121,6 +121,10 @@ func (s *Session) AddTEID(ifType uint8, teid uint32) {
 	s.teidMap.store(ifType, teid)
 }
 
+func (s *Session) DelTEID(ifType uint8) {
+	s.teidMap.delete(ifType)
+}
+
 func (s *Session) AddIp(ip string) {
 	s.ipAddrString = ip
 }
@@ -299,6 +303,10 @@ func newTeidMap() *teidMap {
 
 func (t *teidMap) store(ifType uint8, teid uint32) {
 	t.syncMap.Store(ifType, teid)
+}
+
+func (t *teidMap) delete(ifType uint8) {
+	t.syncMap.Delete(ifType)
 }
 
 func (t *teidMap) load(ifType uint8) (uint32, bool) {

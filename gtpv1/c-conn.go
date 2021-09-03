@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"strings"
 	"sync"
@@ -513,7 +514,8 @@ func (c *CPlaneConn) ParseCreateSession(raddr net.Addr, ies ...*ie.IE) (*Session
 			if err != nil {
 				return nil, err
 			}
-			sess.AddTEID(S11MMEGTPC+c.node, teid)
+			// fix ussue
+			sess.AddTEID(S11MMEGTPU+c.node, teid)
 
 		}
 	}
@@ -729,6 +731,41 @@ func (c *CPlaneConn) NewSenderCTEID() (fteidIE *ie.IE) {
 	}
 	return ie.NewTEIDCPlane(teid)
 }
+
+// Remove previous CTEID and replace by this new one
+func (c *CPlaneConn) NewReplaceSenderCTEID(dteid uint32) (fteidIE *ie.IE) {
+	var teid uint32
+	session, ok := c.iteiSessionMap.load(dteid)
+	if !ok {
+		log.Printf("not registered why ? 0x%x", dteid)
+	}
+	for try := uint32(0); try < 0xffff; try++ {
+		const logEvery = 0xff
+		if try&logEvery == logEvery {
+			logf("Generating NewSenderFTEID crossed tries:%d", try)
+		}
+
+		t := generateRandomUint32()
+		if t == 0 {
+			continue
+		}
+
+		// Try to mark TEID as taken. Fails if something exists
+		if ok := c.iteiSessionMap.tryStore(t, session); !ok {
+			continue
+		}
+
+		teid = t
+		c.iteiSessionMap.delete(dteid)
+		break
+	}
+
+	if teid == 0 {
+		return nil
+	}
+	return ie.NewTEIDCPlane(teid)
+}
+
 func (c *CPlaneConn) NewSenderFTEID() (fteidIE *ie.IE) {
 	return nil
 }
@@ -758,6 +795,13 @@ func (c *CPlaneConn) NewSenderUTEID() (fteidIE *ie.IE) {
 	if teid == 0 {
 		return nil
 	}
+	return ie.NewTEIDDataI(teid)
+}
+
+func (c *CPlaneConn) FirstUteid() (fteidIE *ie.IE) {
+	var teid uint32
+	teid = 1
+
 	return ie.NewTEIDDataI(teid)
 }
 

@@ -129,6 +129,7 @@ func (s *sgw) run(ctx context.Context) error {
 	})
 	s.s5cConn.AddHandlers(map[uint8]gtpv1.HandlerFunc{
 		message.MsgTypeCreatePDPContextResponse: s.handleCreateSessionResponse,
+		message.MsgTypeUpdatePDPContextResponse: s.handleModifyBearerResponse,
 		message.MsgTypeDeletePDPContextResponse: s.handleDeleteSessionResponse,
 	})
 

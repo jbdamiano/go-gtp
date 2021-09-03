@@ -117,7 +117,9 @@ func (s *sgw) handleCreateSessionRequest(s11Conn gtpv1.Conn, mmeAddr net.Addr, m
 	s11Conn.RegisterSession(s11sgwTEID, s11Session)
 
 	s5cFTEID := s.s5cConn.NewSenderCTEID()
-	s5uFTEID := s.s5cConn.NewSenderUTEID()
+
+	// Generate a fakse TEIDu
+	s5uFTEID := s.s5cConn.FirstUteid()
 
 	var s5Session *gtpv1.Session
 	var seq uint16
@@ -131,7 +133,8 @@ func (s *sgw) handleCreateSessionRequest(s11Conn gtpv1.Conn, mmeAddr net.Addr, m
 			csReqFromMME.APN, csReqFromMME.SelectionMode,
 			csReqFromMME.EndUserAddress,
 			ie.NewGSNAddress(s.s5cIP),
-			ie.NewGSNAddress(s.s5uIP),
+			// False GSNu
+			ie.NewGSNAddress("1.1.1.1"),
 		)
 	} else {
 		s5Session, seq, err = s.s5cConn.CreateSession(
@@ -140,7 +143,8 @@ func (s *sgw) handleCreateSessionRequest(s11Conn gtpv1.Conn, mmeAddr net.Addr, m
 			csReqFromMME.RATType, s5cFTEID, s5uFTEID,
 			csReqFromMME.APN, csReqFromMME.SelectionMode,
 			ie.NewGSNAddress(s.s5cIP),
-			ie.NewGSNAddress(s.s5uIP),
+			// False GSNu
+			ie.NewGSNAddress("1.1.1.1"),
 		)
 	}
 	if err != nil {
@@ -272,6 +276,12 @@ func (s *sgw) handleModifyBearerRequest(s11Conn gtpv1.Conn, mmeAddr net.Addr, ms
 		return &gtpv2.RequiredIEMissingError{Type: ie.SGSNNumber}
 	}
 
+	// Regereate a TEIDc a new TEIDu and spefy tge reak GSNu
+	s5uFTEID := s.s5cConn.NewSenderUTEID()
+	s5cSession.AddTEID(gtpv1.S5SGWGTPU, s5uFTEID.MustTEID())
+	tmpTeid, err := s5cSession.GetTEID(gtpv1.S5SGWGTPC)
+	s5cFTEID := s.s5cConn.NewReplaceSenderCTEID(tmpTeid)
+
 	s11mmeTEID, err := s11Session.GetTEID(gtpv1.S11MMEGTPC)
 	if err != nil {
 		log.Printf("S11MMEGTPC not found")
@@ -310,6 +320,51 @@ func (s *sgw) handleModifyBearerRequest(s11Conn gtpv1.Conn, mmeAddr net.Addr, ms
 		); err != nil {
 			return err
 		}
+	}
+
+	s5cpgwTEID, err := s5cSession.GetTEID(gtpv1.S5PGWGTPC)
+	if err != nil {
+		return err
+	}
+
+	seq, err := s.s5cConn.ModifyBearer(s5cpgwTEID, s5cSession, s5cFTEID, s5uFTEID,
+		ie.NewGSNAddress(s.s5cIP),
+		ie.NewGSNAddress(s.s5uIP),
+	)
+	if err != nil {
+		return err
+	}
+
+	var mbRspFromPGW *message.UpdatePDPContextResponse
+
+	incomingMessage, err := s11Session.WaitMessage(seq, 5*time.Second)
+	if err != nil {
+		mbRspFromPGW = message.NewUpdatePDPContextResponse(
+			s11mmeTEID, 0,
+			ie.NewCause(gtpv2.CausePGWNotResponding),
+		)
+
+		if err := s11Conn.RespondTo(mmeAddr, mbReqFromMME, mbRspFromPGW); err != nil {
+			return err
+		}
+		log.Printf(
+			"Sent %s with failure code: %d, target subscriber: %s",
+			mbRspFromPGW.MessageTypeName(), gtpv2.CausePGWNotResponding, s11Session.IMSI,
+		)
+		if s.mc != nil {
+			s.mc.messagesSent.WithLabelValues(mmeAddr.String(), mbReqFromMME.MessageTypeName()).Inc()
+		}
+		return err
+	}
+
+	switch m := incomingMessage.(type) {
+	case *message.UpdatePDPContextResponse:
+		// move forward
+		mbRspFromPGW = m
+
+	default:
+		s11Conn.RemoveSession(s11Session)
+		return &gtpv1.CauseNotOKError{Msg: "toto"}
 	}
 
 	mbRspFromSGW := message.NewUpdatePDPContextResponse(
