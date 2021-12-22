@@ -42,6 +42,7 @@ type Subscriber struct {
 	EUuIFName   string `yaml:"euu_if_name"`
 	HTTPURL     string `yaml:"http_url"`
 	MaxSend     uint32 `yaml:"max_send"`
+	Sleep       uint32 `yaml:"sleep"`
 	Dynamic     bool   `yaml:"dynamic"`
 	Reattach    bool   `yaml:"reattach_on_reload"`
 
@@ -49,6 +50,7 @@ type Subscriber struct {
 	sgwAddr string
 	otei    uint32
 	count   uint32
+	sleep   uint32
 }
 
 // String returns the information of s in string.

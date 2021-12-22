@@ -457,7 +457,7 @@ func (e *enb) runHTTPProbe(ctx context.Context, sub *Subscriber) error {
 		select {
 		case <-ctx.Done():
 			return nil
-		case <-time.After(5 * time.Second):
+		case <-time.After(time.Duration(sub.Sleep) * time.Second):
 			// do nothing here and go forward
 		}
 
@@ -466,6 +466,7 @@ func (e *enb) runHTTPProbe(ctx context.Context, sub *Subscriber) error {
 		if sub.count > sub.MaxSend {
 			return nil
 		}
+		sub.Sleep = 5
 
 		rsp, err := client.Get(sub.HTTPURL)
 		if err != nil {
@@ -476,12 +477,14 @@ func (e *enb) runHTTPProbe(ctx context.Context, sub *Subscriber) error {
 		if rsp.StatusCode == http.StatusOK {
 			log.Printf("[HTTP Probe;%s] Successfully GET %s: Status: %s", sub.IMSI, sub.HTTPURL, rsp.Status)
 			rsp.Body.Close()
+			
 			continue
 		} else {
 			rsp.Body.Close()
 			e.errCh <- fmt.Errorf("got invalid response on HTTP probe: %v", rsp.StatusCode)
 			return nil
 		}
+		
 	}
 }
 
