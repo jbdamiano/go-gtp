@@ -374,6 +374,7 @@ func (m *mme) CreateSession(sess *Session) (*gtpv1.Session, error) {
 			m.s11Conn.NewSenderUTEID(),
 
 			ie.NewAPNRestriction(gtpv2.APNRestrictionNoExistingContextsorRestriction),
+	
 			ie.NewMSTimeZone(9*time.Hour, 0),
 		)
 	} else {

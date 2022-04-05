@@ -163,7 +163,7 @@ func (s *sgw) handleCreateSessionRequest(s11Conn *gtpv2.Conn, mmeAddr net.Addr, 
 		return err
 	}
 
-	log.Printf("Sent Create Session Request to %s for %s", pgwAddrString, s5Session.IMSI)
+	log.Printf("Sent Create Session Request to %s for %s TEID %s", pgwAddrString, s5Session.IMSI, s5cFTEID)
 	if s.mc != nil {
 		s.mc.messagesSent.WithLabelValues(mmeAddr.String(), "Create Session Request").Inc()
 	}

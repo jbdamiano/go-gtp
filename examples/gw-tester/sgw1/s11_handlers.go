@@ -135,6 +135,7 @@ func (s *sgw) handleCreateSessionRequest(s11Conn gtpv1.Conn, mmeAddr net.Addr, m
 			ie.NewGSNAddress(s.s5cIP),
 			// False GSNu
 			ie.NewGSNAddress("1.1.1.1"),
+			csReqFromMME.QoSProfile,
 		)
 	} else {
 		s5Session, seq, err = s.s5cConn.CreateSession(
