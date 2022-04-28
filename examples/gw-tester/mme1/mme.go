@@ -361,7 +361,7 @@ func (m *mme) CreateSession(sess *Session) (*gtpv1.Session, error) {
 			ie.NewIMEISV(sess.IMEISV),
 			ie.NewUserLocationInformationWithSAI(m.enb.mcc, m.enb.mnc, 0x1111, 0x3333),
 			ie.NewRATType(gtpv1.RatTypeUTRAN),
-			ie.NewQoSProfile([]byte{0xde, 0xad, 0xbe, 0xef}), // XXX - Implement!
+			ie.NewQoSProfile([]byte{0x03, 0x1b, 0x93, 0x1f, 0x73, 0x96, 0xfe, 0xfe, 0x74, 0x97, 0xff, 0xff}), // XXX - Implement!
 			ie.NewEndUserAddressIPv4(sess.SrcIP),
 			ie.NewAccessPointName(m.apn),
 			ie.NewSelectionMode(gtpv1.SelectionModeMSorNetworkProvidedAPNSubscribedVerified),
@@ -385,7 +385,7 @@ func (m *mme) CreateSession(sess *Session) (*gtpv1.Session, error) {
 			ie.NewIMEISV(sess.IMEISV),
 			ie.NewUserLocationInformationWithSAI(m.enb.mcc, m.enb.mnc, 0x1111, 0x3333),
 			ie.NewRATType(gtpv1.RatTypeUTRAN),
-			ie.NewQoSProfile([]byte{0xde, 0xad, 0xbe, 0xef}), // XXX - Implement!
+			ie.NewQoSProfile([]byte{0x03, 0x1b, 0x93, 0x1f, 0x73, 0x96, 0xfe, 0xfe, 0x74, 0x97, 0xff, 0xff}), // XXX - Implement!
 			ie.NewAccessPointName(m.apn),
 			ie.NewSelectionMode(gtpv1.SelectionModeMSorNetworkProvidedAPNSubscribedVerified),
 			ie.NewProtocolConfigurationOptions(
