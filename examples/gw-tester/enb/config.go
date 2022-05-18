@@ -45,6 +45,7 @@ type Subscriber struct {
 	Sleep       uint32 `yaml:"sleep"`
 	Dynamic     bool   `yaml:"dynamic"`
 	Reattach    bool   `yaml:"reattach_on_reload"`
+	GetBody        bool   `yaml:"get_body"`
 
 	// values for these fields are given from MME.
 	sgwAddr string

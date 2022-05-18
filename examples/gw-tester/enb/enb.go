@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"sync"
 	"time"
+	"io/ioutil"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/vishvananda/netlink"
@@ -448,9 +449,17 @@ func (e *enb) runHTTPProbe(ctx context.Context, sub *Subscriber) error {
 		return err
 	}
 	dialer := net.Dialer{LocalAddr: laddr}
-	client := http.Client{
-		Transport: &http.Transport{Dial: dialer.Dial},
-		Timeout:   20 * time.Second,
+
+	var client http.Client
+	if sub.GetBody {
+		client = http.Client{
+			Transport: &http.Transport{Dial: dialer.Dial},
+		}
+	}else{
+		client = http.Client{
+			Transport: &http.Transport{Dial: dialer.Dial},
+			Timeout:   20 * time.Second,
+		}
 	}
 
 	for {
@@ -475,9 +484,17 @@ func (e *enb) runHTTPProbe(ctx context.Context, sub *Subscriber) error {
 		}
 
 		if rsp.StatusCode == http.StatusOK {
-			log.Printf("[HTTP Probe;%s] Successfully GET %s: Status: %s", sub.IMSI, sub.HTTPURL, rsp.Status)
-			rsp.Body.Close()
-			
+			defer rsp.Body.Close()
+			log.Printf("[HTTP Probe;%s] Successfully GET %s: Status: %s get body", sub.IMSI, sub.HTTPURL, rsp.Status)
+			if sub.GetBody {
+				_, err := ioutil.ReadAll(rsp.Body)
+				if err != nil {
+					e.errCh <- fmt.Errorf("[HTTP Probe;%s] failed to GET %s: %w", sub.IMSI, sub.HTTPURL, err)
+				} else {
+
+					log.Printf("[HTTP Probe;%s] Successfully read body for %s", sub.IMSI, sub.HTTPURL)
+				}
+			}
 			continue
 		} else {
 			rsp.Body.Close()

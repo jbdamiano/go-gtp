@@ -1,10 +1,10 @@
-FROM ubuntu:20.04
+FROM golang:1.18
 LABEL org.opencontainers.image.authors="jean-bernard.damiano@airnity.com"
 
 
 WORKDIR /opt
 ENV TZ=Europe/Paris
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && apt update && apt upgrade -y && apt install -y git golang-go iproute2 tcpdump net-tools 
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && apt update && apt upgrade -y && apt install -y git iproute2 tcpdump net-tools 
 
 
 ADD gogtp.tar.gz /go-gtp
