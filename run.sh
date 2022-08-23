@@ -13,4 +13,14 @@ if [[ -n "${DEV2}" ]]; then
   ifconfig $DEV2 mtu $MTU
 fi
 
-/go-gtp/$ELEMENT -config "$CONFIG_PATH"/$ELEMENT.yml
+if [[ $ELEMENT == sgw && $K8S == 1 ]]
+then
+  ip route add $IP_PFCP dev $DEV_PFCP
+  ip route add $IP_GTPP dev $DEV_GTPP
+fi
+if [[ $ELEMENT == enb && $K8S == 1 ]]
+then
+  /bin/bash
+else
+  /go-gtp/$ELEMENT -config "$CONFIG_PATH"/$ELEMENT.yml
+fi

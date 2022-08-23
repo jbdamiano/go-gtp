@@ -454,6 +454,7 @@ func (e *enb) runHTTPProbe(ctx context.Context, sub *Subscriber) error {
 	if sub.GetBody {
 		client = http.Client{
 			Transport: &http.Transport{Dial: dialer.Dial},
+			Timeout: 15 * time.Minute,
 		}
 	}else{
 		client = http.Client{
