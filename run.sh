@@ -20,7 +20,7 @@ then
 fi
 if [[ $ELEMENT == enb && $K8S == 1 ]]
 then
-  /bin/bash
+  tail -f /dev/null
 else
   /go-gtp/$ELEMENT -config "$CONFIG_PATH"/$ELEMENT.yml
 fi
