@@ -15,8 +15,8 @@ fi
 
 if [[ $ELEMENT == sgw && $K8S == 1 ]]
 then
-  ip route add $IP_PFCP dev $DEV_PFCP
-  ip route add $IP_GTPP dev $DEV_GTPP
+  ip route add $IP_PFCP via $ITF_IP dev $DEV_PFCP
+  ip route add $IP_GTPP via $ITF_IP dev $DEV_GTPP
 fi
 if [[ $ELEMENT == enb && $K8S == 1 ]]
 then
