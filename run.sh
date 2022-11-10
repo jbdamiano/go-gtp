@@ -18,7 +18,16 @@ then
   ip route add $IP_PFCP via $ITF_IP dev $DEV_PFCP
   ip route add $IP_GTPP via $ITF_IP dev $DEV_GTPP
 fi
-if [[ $ELEMENT == enb && $K8S == 1 ]]
+
+if [[ $ELEMENT == sgw && $VPP == 1 ]]
+then
+  apt install iputils-ping ethtool
+
+  ip route add  10.40.1.0/24 via 172.19.0.4
+  ethtool --offload  eth0  rx off  tx off
+  arp -i eth0 -s 10.40.1.2   02:42:ac:13:00:06
+fi
+if [[ $ELEMENT == enb && $STOP == 1 ]]
 then
   tail -f /dev/null
 else

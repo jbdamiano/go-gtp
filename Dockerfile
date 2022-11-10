@@ -13,5 +13,7 @@ RUN cd /go-gtp &&  go build -o enb examples/gw-tester/enb/*.go && go build -o mm
 COPY run.sh /go-gtp 
 RUN chmod +x /go-gtp/run.sh
 
+WORKDIR /go-gtp
+
 ENTRYPOINT ["/go-gtp/run.sh"]
 
