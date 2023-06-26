@@ -132,6 +132,7 @@ func (s *sgw) handleCreateSessionRequest(s11Conn gtpv1.Conn, mmeAddr net.Addr, m
 			csReqFromMME.RATType, s5cFTEID, s5uFTEID,
 			csReqFromMME.APN, csReqFromMME.SelectionMode,
 			csReqFromMME.EndUserAddress,
+			ie.NewNSAPI(5),
 			ie.NewGSNAddress(s.s5cIP),
 			// False GSNu
 			ie.NewGSNAddress("1.1.1.1"),
@@ -143,6 +144,7 @@ func (s *sgw) handleCreateSessionRequest(s11Conn gtpv1.Conn, mmeAddr net.Addr, m
 			csReqFromMME.IMSI, csReqFromMME.MSISDN, csReqFromMME.IMEI, csReqFromMME.UserLocationInformation,
 			csReqFromMME.RATType, s5cFTEID, s5uFTEID,
 			csReqFromMME.APN, csReqFromMME.SelectionMode,
+			ie.NewNSAPI(5),
 			ie.NewGSNAddress(s.s5cIP),
 			// False GSNu
 			ie.NewGSNAddress("1.1.1.1"),
