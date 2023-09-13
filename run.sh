@@ -5,12 +5,17 @@ ls /go-gtp/
 CONFIG_PATH="${CONFIG_PATH:-/go-gtp/config/}"
 MTU="${DEV_MTU:-1400}"
 
-if [[ -n "${DEV1}" ]]; then
-  ifconfig $DEV1 mtu $MTU
-fi
 
-if [[ -n "${DEV2}" ]]; then
-  ifconfig $DEV2 mtu $MTU
+if [[ $ELEMENT != iperf3 ]]
+then
+  if [[ -n "${DEV1}" ]]; then
+    ifconfig $DEV1 mtu $MTU
+  fi
+
+
+  if [[ -n "${DEV2}" ]]; then
+    ifconfig $DEV2 mtu $MTU
+  fi
 fi
 
 if [[ $ELEMENT == sgw && $K8S == 1 ]]
@@ -31,5 +36,12 @@ if [[ $ELEMENT == enb && $STOP == 1 ]]
 then
   tail -f /dev/null
 else
-  /go-gtp/$ELEMENT -config "$CONFIG_PATH"/$ELEMENT.yml
+  if [[ $ELEMENT == iperf3 ]]
+  then
+    ip r add $DEST/32 via $REMOTE dev $DEV
+    tail -f /dev/null
+  else
+    /go-gtp/$ELEMENT -config "$CONFIG_PATH"/$ELEMENT.yml
+  fi
 fi
+
