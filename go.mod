@@ -7,7 +7,7 @@ require (
 	github.com/google/go-cmp v0.5.5
 	github.com/pascaldekloe/goe v0.1.0
 	github.com/prometheus/client_golang v1.11.0
-	github.com/vishvananda/netlink v1.1.0
+	github.com/vishvananda/netlink v1.3.0
 	golang.org/x/net v0.0.0-20210501142056-aec3718b3fa0 // indirect
 	google.golang.org/grpc v1.33.2
 	google.golang.org/protobuf v1.26.0 // indirect

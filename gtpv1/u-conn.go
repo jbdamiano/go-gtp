@@ -35,6 +35,7 @@ type UPlaneConn struct {
 	mu      sync.Mutex
 	laddr   net.Addr
 	pktConn net.PacketConn
+	pktConn0 net.PacketConn
 	*msgHandlerMap
 	*iteiMap
 

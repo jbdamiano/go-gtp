@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strings"
 
 	"github.com/vishvananda/netlink"
 )
@@ -46,8 +47,22 @@ func (u *UPlaneConn) EnableKernelGTP(devname string, role Role) error {
 			return err
 		}
 	}
+	if u.pktConn0 == nil {
+		var err error
+
+		addr := strings.Replace(u.laddr.String(), "2152", "3386", 1)
+   
+		u.pktConn0, err = net.ListenPacket(u.laddr.Network(), addr)
+		if err != nil {
+			return err
+		}
+	}
 
 	f, err := u.pktConn.(*net.UDPConn).File()
+	if err != nil {
+		return fmt.Errorf("failed to retrieve file from conn: %w", err)
+	}
+	f0, err := u.pktConn0.(*net.UDPConn).File()
 	if err != nil {
 		return fmt.Errorf("failed to retrieve file from conn: %w", err)
 	}
@@ -56,6 +71,7 @@ func (u *UPlaneConn) EnableKernelGTP(devname string, role Role) error {
 		LinkAttrs: netlink.LinkAttrs{
 			Name: devname,
 		},
+		FD0:  int(f0.Fd()),
 		FD1:  int(f.Fd()),
 		Role: int(role),
 	}
